@@ -1,0 +1,429 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ page
+	import="java.util.List, com.kh.admin.model.dto.BlockMemberDTO, com.kh.common.model.vo.PageInfo, com.kh.admin.model.vo.Block"%>
+<%
+	List<BlockMemberDTO> list = (List<BlockMemberDTO>) request.getAttribute("list");
+	PageInfo pi = (PageInfo) request.getAttribute("pi");
+	String filter = (String) request.getAttribute("filter");
+	String result = (String) request.getAttribute("result");
+	
+	int currentPage = pi.getCurrentPage();
+	int startPage = pi.getStartPage();
+	int endPage = pi.getEndPage();
+	int maxPage = pi.getMaxPage();
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<meta charset="UTF-8">
+<title>회원차단 페이지</title>
+
+
+
+</head>
+<link rel="stylesheet" type="text/css"
+	href="${pageContext.request.contextPath}/resources/css/adminCss/block.css">
+<body>
+	<div class="container">
+
+		<%@ include file="/views/common/AdminSidebar.jsp"%>
+
+		<div class="main-content">
+			<header>
+				<h1>회원차단</h1>
+				<div class="admin-icons">
+					<a href="#" class="tooltip" id="logout-btn"> <img
+						src="<%=contextPath%>/resources/logout이미지.png" alt="로그아웃">
+					</a> <a href="#" class="tooltip" id="home-btn"> <img
+						src="<%=contextPath%>/resources/mainPage이동.png" alt="메인페이지 이동"
+						id="home">
+					</a>
+				</div>
+				<script>
+					document.getElementById('logout-btn').setAttribute(
+							'data-tooltip', '로그아웃');
+					document.getElementById('home-btn').setAttribute(
+							'data-tooltip', '메인페이지 이동');
+				</script>
+			</header>
+
+
+			<!-- 검색 및 정렬 영역 -->
+			<div class="controls">
+				<form action="<%= request.getContextPath() %>/admin/SearchUser"
+					method="get" id="searchForm">
+					<div class="search-box">
+						<input type="text" id="search-id" name="searchId"
+							placeholder="아이디 입력"> <input type="hidden" name="filter"
+							id="filterInput" value="<%= filter != null ? filter : "all" %>">
+
+						<input type="hidden" name="cpage"
+							value="<%= pi.getCurrentPage() %>">
+
+						<button type="button" class="search-btn"
+							onclick="submitSearchForm()">조회</button>
+					</div>
+				</form>
+
+				<script>
+				    // 검색 폼 제출 전 처리 (검색어가 비어 있으면 searchId 제거)
+				    function submitSearchForm() {
+				        const searchInput = document.getElementById('search-id');
+				        const filterInput = document.getElementById('filterInput');
+				        const form = document.getElementById('searchForm');
+				        
+				        console.log("Search Input Value:", searchInput.value);
+				        
+				        // 검색어가 비어 있을 경우 searchId 파라미터 제거
+				        if (searchInput.value.trim() === "") {
+				        	filterInput.value = "all"
+				        }
+				        form.submit();
+				    }
+				</script>
+
+
+				<form action="<%= request.getContextPath() %>/admin/MemberBlock"
+					method="get" id="filterForm">
+					<div class="sort-box">
+						<select id="sort-select" name="sort-select" placeholder="정렬기준"
+							onchange="submitFilterForm()">
+							<option value="all" <%= "all".equals(filter) ? "selected" : "" %>>전체회원</option>
+							<option value="blocked"
+								<%= "blocked".equals(filter) ? "selected" : "" %>>차단회원</option>
+							<option value="unblocked"
+								<%= "unblocked".equals(filter) ? "selected" : "" %>>차단안된회원</option>
+						</select> <input type="hidden" name="searchId"
+							value="<%= request.getParameter("searchId") != null ? request.getParameter("searchId") : "" %>">
+						<input type="hidden" name="cpage"
+							value="<%= pi.getCurrentPage() %>">
+						<%-- <input type="hidden" name="cpage" value="<%= currentPage %>"> --%>
+					</div>
+				</form>
+
+
+				<script>
+				    function submitFilterForm() {
+				        document.getElementById('filterForm').submit();
+				    }
+				</script>
+
+				<div class="action-buttons">
+					<button type="button" class="block-btn" onclick="showBlockAlert()">차단</button>
+					<button type="button" class="unblock-btn">해제</button>
+				</div>
+			</div>
+
+			<!-- 커스텀 알럿 모달 -->
+			<div class="custom-alert" id="customAlert">
+				<h2>차단 일수 설정</h2>
+				<ul>
+			        <li><input type="checkbox" name="blockReason" value="1-스팸성 댓글 작성"> 1일 - 스팸성 댓글 작성</li>
+			        <li><input type="checkbox" name="blockReason" value="2-게시글 주제 일탈"> 2일 - 게시글 주제 일탈</li>
+			        <li><input type="checkbox" name="blockReason" value="3-경미한 언어폭력"> 3일 - 경미한 언어폭력</li>
+			        <li><input type="checkbox" name="blockReason" value="7-욕설 및 비하발언"> 7일 - 욕설 및 비하발언</li>
+			        <li><input type="checkbox" name="blockReason" value="14-불법 컨텐츠 업로드"> 14일 - 불법 컨텐츠 업로드</li>
+			        <li><input type="checkbox" name="blockReason" value="30-혐오 발언 및 차별적 행동"> 30일 - 혐오 발언 및 차별적 행동</li>
+				</ul>
+				<button id="confirmBlock">확인</button>
+				<button onclick="closeAlert()">취소</button>
+			</div>
+			<div class="overlay" id="overlay"></div>
+
+			<!-- 차단사유 선택 체크박스 하나만 선택되게 하는 기능 -->
+			<script>
+			    document.querySelectorAll('input[name="blockReason"]').forEach(checkbox => {
+			        checkbox.addEventListener('click', function() {
+			            document.querySelectorAll('input[name="blockReason"]').forEach(cb => {
+			                if (cb !== this) {
+			                    cb.checked = false;
+			                }
+			            });
+			        });
+			    });
+			</script>
+
+			<script>
+			    // 행 데이터 저장용 배열
+			    let selectedUsers  = [];
+			
+			    // 체크박스 클릭 시 선택된 행의 데이터 수집
+			    document.addEventListener('change', function(e) {
+			        if (e.target.name === 'blockCheckbox') {
+			            const row = e.target.closest('tr');  // 체크된 행(tr) 찾기
+			            const rowData = {
+			                userNo: row.children[0].textContent,
+			                userId: row.children[1].textContent,
+			                blockReason: row.children[2].textContent,
+			                blockDay: row.children[3].textContent,
+			                blockDate: row.children[4].textContent,
+			                rowElement: row  // DOM 요소 저장
+			            };
+			
+			            // 체크박스가 체크된 경우 데이터 추가, 체크 해제 시 제거
+			            if (e.target.checked) {
+			            	selectedUsers.push(rowData);
+			            } else {
+			                selectedUsers = selectedUsers.filter(item => item.userNo !== rowData.userNo);
+			            }
+			            console.log("현재 selectedUsers: ", selectedUsers);
+
+			        }
+			    });
+			    
+			    function showBlockAlert() {
+			        if (selectedUsers.length === 0) {
+			            alert("차단할 회원을 선택하세요.");
+			            return;
+			        }
+			        document.getElementById("customAlert").style.display = "block";
+			        document.getElementById("overlay").style.display = "block";
+			    }
+
+
+			    function closeAlert() {
+			    	document.getElementById("customAlert").style.display = "none";
+			    	document.getElementById("overlay").style.display = "none";
+			    }
+			    </script>
+			    	
+				<script>
+			 // DOMContentLoaded 내에서 이벤트 리스너 추가
+			    document.addEventListener('DOMContentLoaded', function () {
+			        const confirmBlockBtn = document.getElementById('confirmBlock');
+			        
+			        // confirmBlock 버튼에 이벤트 추가
+			        if (confirmBlockBtn) {
+			            confirmBlockBtn.addEventListener('click', function () {
+			            	
+			                console.log("confirmBlock 버튼 클릭됨");
+			                console.log("선택된 회원 목록: ", selectedUsers);
+			            	
+			            
+			                const selectedOption = document.querySelector('input[name="blockReason"]:checked');
+
+			                if (!selectedOption) {
+			                    alert("차단할 사유를 선택하세요.");
+			                    return;
+			                }
+
+					const [days, reason] = selectedOption.value.split('-');
+					
+		            // 선택된 회원에 대한 차단 정보 업데이트 (DOM 조작)
+		            selectedUsers.forEach(user => {
+		                console.log("현재 조작 중인 행: ", user.rowElement);
+		                console.log("userId: ", user.userId);
+		                user.rowElement.children[2].textContent = reason;  // 차단 사유 업데이트
+		            });
+
+		            // ====== [수정된 부분 - AJAX 요청 전송] ======
+		            fetch('<%= request.getContextPath() %>/admin/blockUser', {
+		                method: 'POST',
+		                headers: {
+		                    'Content-Type': 'application/json'
+		                },
+		                body: JSON.stringify(selectedUsers.map(user => ({
+		                    member: {
+		                    	userId: user.userId
+		                    },
+		                    block: {
+			                    reason: reason		                    	
+		                    }
+		                })))
+		            })
+		            .then(response => response.json())
+		            .then(data => {
+		                if (data.success) {
+		                    alert("회원 차단 완료");
+		                    location.reload();
+		                } else {
+		                    alert("회원 차단 실패");
+		                }
+		            })
+		            .catch(error => {
+		                console.error("서버 오류 발생: ", error);
+		                alert("서버에서 문제가 발생했습니다.");
+		            });
+		            // ========================================
+		            
+		            closeAlert();
+		        });
+		    }
+		});
+		    
+		</script>
+	
+
+
+
+			<!-- 회원차단 테이블 -->
+			<table class="list-area">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>아이디</th>
+						<th>차단 사유</th>
+						<th>차단 일수</th>
+						<th>차단 일시</th>
+						<th>선택</th>
+					</tr>
+				</thead>
+				<tbody id="blockMemberTable">
+					<% 
+							    String searchId = request.getParameter("result");
+								for(BlockMemberDTO b : list) { 
+									 if (searchId == null || searchId.isEmpty() || b.getMember().getUserId().contains(searchId)) {
+							%>
+					<tr data-status="<%= b.getBlock().getReason() != null ? "blocked" : "unblocked" %>">
+						<td><%= b.getMember().getUserNo() %></td>
+						<td><%= b.getMember().getUserId() %></td>
+						<td><%= b.getBlock().getReason() != null ? b.getBlock().getReason() : "N/A" %></td>
+						<td><%= b.getBlock().getBlockDay() %></td>
+						<td><%= b.getBlock().getBlockDate() != null ? b.getBlock().getBlockDate() : "-" %></td>
+						<td><input type="checkbox" name="blockCheckbox"
+							value="<%= b.getMember().getUserId() %>"></td>
+					</tr>
+					<% 
+									 }
+								} 
+							%>
+
+				</tbody>
+			</table>
+
+
+
+			<script>
+					document.addEventListener('DOMContentLoaded', function() {
+ 					    let allRows = [];  // 전체 데이터 저장
+						document.querySelectorAll('#blockMemberTable tr').forEach(row => {
+						    allRows.push(row);					
+						});
+
+				    	document.getElementById('sort-select').addEventListener('change', function() {
+				        const selectedValue = this.value;  // 선택된 값
+				        const rows = document.querySelectorAll('#blockMemberTable tr');  // 모든 행 선택
+				        const pagination = document.querySelectorAll('.pagination');
+				        let visibleRows = 0;
+				        
+				        allRows.forEach(row => {
+				            const status = row.getAttribute('data-status');
+				            if (selectedValue === 'all' || selectedValue === status) {
+				                row.style.display = '';
+				                visibleRows++;
+				            } else {
+				                row.style.display = 'none';
+				            }
+				        });
+
+				        // 페이지네이션 숨김/보이기
+				        pagination.forEach(pg => {
+				        	pg.style.display = (visibleRows <= 10) ? 'none' : 'block';				        	
+				        });
+				        
+				    });
+				   });
+				</script>
+
+
+
+
+			<script>
+				    // 필터링 기능 - JavaScript로 클라이언트 측에서 필터링
+				    function submitSearchForm() {
+				        const searchId = document.getElementById('search-id').value.toLowerCase();
+				        const table = document.getElementById('blockMemberTable');
+				        const rows = table.getElementsByTagName('tr');
+				        const pagination = document.getElementsByClassName('pagination');
+				        let filtered = false;
+				
+				        // 각 행을 확인하여 필터링 수행
+				        for (let i = 0; i < rows.length; i++) {
+				            const userId = rows[i].getElementsByTagName('td')[1].innerText.toLowerCase();
+				            if (userId.includes(searchId)) {
+				                rows[i].style.display = '';
+				                filtered = true;
+				            }else if(searchId === '') {
+				            	rows[i].style.display = '';
+				            } else {
+				                rows[i].style.display = 'none';
+				            }
+				        }
+				        
+				        for (let i = 0; i < pagination.length; i++) {
+				        	pagination[i].style.display = searchId === '' ? '' : (filtered ? 'none' : '');
+				        }
+				    }
+				</script>
+
+
+
+
+
+			
+
+
+			<!-- 전체 선택/해제 기능 -->
+			<script>
+			function toggleAllCheckboxes(source) {
+				  const checkboxes = document.querySelectorAll('input[name="blockCheckbox"]');
+				   checkboxes.forEach(checkbox => {
+				            checkbox.checked = source.checked;
+				        });
+				    }
+			</script>
+
+			<script>
+	        	$(function() {
+	        		$(".list-area>tbody>tr").click(function(){
+	        			location.assign("<%= contextPath %>/MemberBlock/detail?bno="+$(this).children().eq(0).text()+"&cpage=<%= currentPage %>");
+	        		});
+	        	});
+        	</script>
+
+			<div align="center" class="pagination">
+				<% if (pi.getCurrentPage() > 1) { %>
+				<!-- 처음 페이지로 이동 -->
+				<a
+					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=1&sort-select=<%= filter != null ? filter : "all" %>">&lt;&lt;</a>
+				<a
+					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getCurrentPage() - 1 %>&sort-select=<%= filter != null ? filter : "all" %>">&lt;</a>
+				<% } %>
+
+				<% for (int p = pi.getStartPage(); p <= pi.getEndPage(); p++) { %>
+				<a
+					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= p %>&sort-select=<%= filter != null ? filter : "all" %>"
+					class="<%= (pi.getCurrentPage() == p) ? "active" : "" %>"> <%= p %>
+				</a>
+				<% } %>
+
+				<% if (pi.getCurrentPage() < pi.getMaxPage()) { %>
+				<a
+					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getCurrentPage() + 1 %>&sort-select=<%= filter != null ? filter : "all" %>">&gt;</a>
+				<a
+					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getMaxPage() %>&sort-select=<%= filter != null ? filter : "all" %>">&gt;&gt;</a>
+				<% } %>
+			</div>
+
+			<script>
+			    function movePage(cpage){
+			        const sortValue = document.getElementById('sort-select').value;
+			        location.assign('<%= request.getContextPath() %>/admin/MemberBlock?cpage=' + cpage + '&sort-select=' + sortValue);
+			    };
+			</script>
+		</div>
+	</div>
+	</div>
+	
+	
+	
+	
+	
+	
+
+
+	
+</body>
+</html>

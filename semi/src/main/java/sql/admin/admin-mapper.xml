@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+<entry key="selectFList">
+    SELECT *
+    FROM (
+        SELECT ROWNUM AS RNUM, A.*
+        FROM (
+            SELECT BOARD_NO,
+                   BOARD_WRITER,
+                   BOARD_TITLE,
+                   COUNT,
+                   CREATE_DATE,
+                   BOARD_CATEGORY
+            FROM BOARD B
+            WHERE B.BOARD_STATUS = 'Y'
+              AND B.BOARD_CATEGORY = 1
+            ORDER BY CREATE_DATE DESC
+        ) A )
+        WHERE RNUM BETWEEN ? AND ?
+    
+</entry>
+		<entry key="selectEList">
+		    SELECT *
+		    FROM (
+		        SELECT ROWNUM AS RNUM, A.*
+		        FROM (
+		            SELECT BOARD_NO,
+		                   BOARD_WRITER,
+		                   BOARD_TITLE,
+		                   COUNT,
+		                   CREATE_DATE,
+		                   BOARD_CATEGORY
+		            FROM BOARD B
+		            WHERE B.BOARD_STATUS = 'Y'
+		              AND B.BOARD_CATEGORY = 2
+		            ORDER BY CREATE_DATE DESC
+		        ) A )
+		        WHERE RNUM BETWEEN ? AND ?
+		    
+		</entry>
+		
+		<entry key="selectMList">
+		    SELECT *
+		    FROM (
+		        SELECT ROWNUM AS RNUM, A.*
+		        FROM (
+		            SELECT BOARD_NO,
+		                   BOARD_WRITER,
+		                   BOARD_TITLE,
+		                   COUNT,
+		                   CREATE_DATE,
+		                   BOARD_CATEGORY
+		            FROM BOARD B
+		            WHERE B.BOARD_STATUS = 'Y'
+		              AND B.BOARD_CATEGORY = 3
+		            ORDER BY CREATE_DATE DESC
+		        ) A )
+		        WHERE RNUM BETWEEN ? AND ?
+		    
+		</entry>
+
+
+	<entry key="selectBaordFListCount">
+		SELECT COUNT(*)
+		FROM BOARD
+		WHERE BOARD_CATEGORY = 1
+	</entry>
+	
+	
+	<entry key="selectBaordEListCount">
+		SELECT COUNT(*)
+		FROM BOARD
+		WHERE BOARD_CATEGORY = 2
+	</entry>
+	
+	
+	<entry key="selectBaordMListCount">
+		SELECT COUNT(*)
+		FROM BOARD
+		WHERE BOARD_CATEGORY = 3
+	</entry>
+
+
+   <entry key="ReportBoardCount">
+
+		SELECT COUNT(*)
+		FROM   BOARD		
+		WHERE  BOARD_DEC = 'Y'
+		   
+   </entry>
+   
+   
+   <entry key="ReportReplyCount">
+	   	SELECT  COUNT(*)
+		FROM REPLY  
+		WHERE  REPLY_STATUS = 'Y'  
+   
+   </entry>
+   
+   <entry key="ReportReivewCount">
+		SELECT COUNT(*)
+		FROM REVIEW 
+		WHERE  REVIEW_DEC = 'Y' 
+			
+   </entry>
+   
+   <entry key="selectBaordList">
+		SELECT *
+    FROM (
+        SELECT ROWNUM AS RNUM, A.*
+        FROM (
+             SELECT 
+		    B.BOARD_NO, 
+		    M.USER_ID AS BOARD_WRITER, 
+		    B.BOARD_CATEGORY, 
+		    B.BOARD_TITLE, 
+		    B.COUNT, 
+		    B.CREATE_DATE, 
+		    B.BOARD_STATUS, 
+		    B.BOARD_DEC
+		FROM 
+		    BOARD B
+		LEFT JOIN 
+		    REPORT R
+		ON 
+		    B.BOARD_NO = R.BOARD_NO
+		 JOIN 
+		    MEMBER M
+		ON 
+		    B.BOARD_WRITER = M.USER_NO
+		WHERE 
+		    B.BOARD_STATUS = 'Y' AND
+		    B.BOARD_DEC = 'Y'
+		ORDER BY 
+		    B.CREATE_DATE DESC
+        ) A )
+        WHERE RNUM BETWEEN ? AND ?
+   
+   </entry>
+   
+   <entry key="selectReplyList">
+		  SELECT *
+   	 FROM (
+        SELECT ROWNUM AS RNUM, A.*
+        FROM (
+             SELECT 
+		    R.REPLY_NO, 
+		    R.BOARD_NO, 
+		    M.USER_ID AS REPLY_WRITER, 
+		    R.REPLY_CONTENT, 
+		    R.CREATE_DATE, 
+		    R.REPLY_STATUS, 
+		    R.REPLY_DEC,
+            B.BOARD_TITLE
+		FROM 
+		    REPLY R
+		LEFT JOIN 
+		    REPORT RE
+		ON 
+		    R.REPLY_NO = RE.REPLY_NO
+		JOIN 
+		    MEMBER M
+		ON 
+		    R.REPLY_WRITER = M.USER_NO
+        JOIN
+            BOARD B
+        ON R.BOARD_NO = B.BOARD_NO
+		
+        WHERE 
+		    R.REPLY_STATUS = 'Y' 
+		ORDER BY 
+		    R.CREATE_DATE DESC
+        ) A )
+        WHERE RNUM BETWEEN ? AND ?
+   
+   </entry>
+   
+  <entry key="selectReviewList">
+			 SELECT *
+    FROM (
+        SELECT ROWNUM AS RNUM, A.*
+        FROM (
+              SELECT 
+		    R.REVIEW_NO, 
+		    M.USER_ID AS REVIEW_WRITER, 
+		    P.PRODUCT_NAME, 
+		    R.REVIEW_CONTENT, 
+		    R.REVIEW_DATE, 
+		    R.REVIEW_SCORE, 
+		    R.REVIEW_DEC
+		FROM 
+		    REVIEW R
+		LEFT JOIN 
+		    REPORT RE
+		ON 
+		    R.REVIEW_NO = RE.REVIEW_NO
+		JOIN 
+		    MEMBER M
+		ON 
+		    R.REVIEW_WRITER = M.USER_NO
+		JOIN 
+		    PRODUCT P
+		ON 
+		    R.PRODUCT_NO = P.PRODUCT_NO
+		WHERE 
+		    R.REVIEW_DEC = 'Y' 
+		ORDER BY 
+		    R.REVIEW_DATE DESC
+        ) A )
+        WHERE RNUM BETWEEN ? AND ?
+  
+  </entry>
+   
+   <entry key="boardDelete">
+   	DELETE FROM BOARD
+	WHERE BOARD_NO = ?
+	 
+   </entry>
+   <entry key="eboardDelete">
+   	DELETE FROM BOARD
+	WHERE BOARD_NO = ?
+	 
+   </entry>
+   <entry key="fboardDelete">
+   	DELETE FROM BOARD
+	WHERE BOARD_NO = ?
+	 
+   </entry>
+   <entry key="mboardDelete">
+   	DELETE FROM BOARD
+	WHERE BOARD_NO = ?
+	 
+   </entry>
+   
+   <entry key="replyDelete">
+   DELETE FROM REPLY
+	WHERE REPLY_NO = ?
+   </entry>
+   
+   <entry key="reivewDelete">
+   DELETE FROM REVIEW
+	WHERE REVIEW_NO = ?
+   </entry>
+   <entry key="selectListCount">
+		SELECT COUNT(*)
+		FROM MEMBER 
+		LEFT JOIN BLOCK USING (BLOCK_NO)
+	</entry>
+	
+	<entry key="selectAllList">
+		SELECT *
+		FROM (
+		    SELECT ROWNUM RNUM, A.*
+		    FROM (
+		        SELECT
+		            USER_NO, m.USER_ID, BLOCK_REASON, BLOCK_DAY, BLOCK_DATE
+		        FROM MEMBER m
+		        LEFT JOIN BLOCK USING(BLOCK_NO)
+		        ORDER BY USER_NO
+		    ) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="updateBlock">
+		UPDATE MEMBER m
+		SET (BLOCK_NO) = 
+		    (SELECT BLOCK_NO
+		     FROM BLOCK b
+		     WHERE BLOCK_REASON = ?)
+		WHERE USER_ID = ?
+	</entry>
+	
+	<entry key="searchId">
+		SELECT USER_NO, M.USER_ID, BLOCK_REASON, BLOCK_DAY, BLOCK_DATE
+		FROM MEMBER M
+		LEFT JOIN BLOCK B USING(BLOCK_NO)
+		WHERE M.USER_ID = ?
+	</entry>
+	
+	<entry key="selectBlockList">
+		SELECT *
+		FROM (
+		    SELECT ROWNUM RNUM, A.*
+		    FROM (
+		        SELECT
+		            USER_NO, m.USER_ID, BLOCK_REASON, BLOCK_DAY, BLOCK_DATE
+		        FROM MEMBER m
+		        LEFT JOIN BLOCK USING(BLOCK_NO)
+		        WHERE BLOCK_NO IS NOT NULL
+		        ORDER BY USER_NO
+		    ) A
+		)
+		WHERE RNUM BETWEEN ? AND ?	
+	</entry>
+	
+	<entry key="selectBlockCount">
+		SELECT COUNT(*)
+		FROM MEMBER 
+		LEFT JOIN BLOCK USING (BLOCK_NO)
+		WHERE BLOCK_NO IS NOT NULL
+	</entry>
+	
+	<entry key="selectUnblockList">
+		SELECT *
+		FROM (
+		    SELECT ROWNUM RNUM, A.*
+		    FROM (
+		        SELECT
+		            USER_NO, m.USER_ID, BLOCK_REASON, BLOCK_DAY, BLOCK_DATE
+		        FROM MEMBER m
+		        LEFT JOIN BLOCK USING(BLOCK_NO)
+		        WHERE BLOCK_NO IS NULL
+		        ORDER BY USER_NO
+		    ) A
+		)
+		WHERE RNUM BETWEEN ? AND ?	
+	</entry>
+	
+	<entry key="selectUnblockCount">
+		SELECT COUNT(*)
+		FROM MEMBER 
+		LEFT JOIN BLOCK USING (BLOCK_NO)
+		WHERE BLOCK_NO IS NULL
+	</entry>
+	
+	<entry key="searchAllList">
+		SELECT USER_NO, M.USER_ID, BLOCK_REASON, BLOCK_DAY, BLOCK_DATE
+		FROM MEMBER M
+		LEFT JOIN BLOCK B USING(BLOCK_NO)
+	</entry>
+   
+</properties>
+
+
+
+
