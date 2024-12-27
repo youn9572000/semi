@@ -7,9 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>공지사항</title>
-<link rel="stylesheet"
-	href="<%=request.getContextPath()%>/resources/css/board.css"
-	type="text/css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css" type="text/css">
 </head>
 <body>
 	<%@ include file="/views/common/menubar.jsp"%>
@@ -65,7 +63,6 @@
         <button class="page-btn">5</button>
         <button class="page-btn">&gt;</button>
       </div>
-
 
 		</section>
 	</main>
