@@ -44,7 +44,7 @@
 				</script>
 			</header>
 			<!-- 검색 박스 -->
-			<form action="${pageContext.request.contextPath}/admin/search"
+			<form class="search-box" action="${pageContext.request.contextPath}/admin/search"
 				method="get">
 				<input type="hidden" name="type" value="event" /> <input type="text"
 					name="keyword" placeholder="검색어를 입력하세요" value="${param.keyword}" />
