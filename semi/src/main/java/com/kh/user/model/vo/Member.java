@@ -8,13 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-
 public class Member {
 	private int userNo;
 	private String userId;
