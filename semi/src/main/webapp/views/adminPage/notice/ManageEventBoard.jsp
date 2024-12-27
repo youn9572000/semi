@@ -13,11 +13,12 @@
 %>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>행사게시판 관리</title>
-    <!-- 공통 CSS는 AdminSidebar.jsp에 포함됨 -->
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/css/adminCss/notice.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>행사게시판 관리</title>
+<!-- 공통 CSS는 AdminSidebar.jsp에 포함됨 -->
+<link rel="stylesheet" type="text/css"
+	href="${pageContext.request.contextPath}/resources/css/adminCss/notice.css">
 </head>
 <body>
 	<div class="container">
@@ -31,7 +32,8 @@
 				<div class="admin-icons">
 					<a href="#" class="tooltip" id="logout-btn"> <img
 						src="<%=contextPath%>/resources/logout이미지.png" alt="로그아웃">
-					</a> <a href="<%= contextPath %>/views/adminPage/admin/MainPage.jsp" class="tooltip" id="home-btn"> <img
+					</a> <a href="<%= contextPath %>/views/adminPage/admin/MainPage.jsp"
+						class="tooltip" id="home-btn"> <img
 						src="<%=contextPath%>/resources/mainPage이동.png" alt="메인페이지 이동"
 						id="home">
 					</a>
@@ -44,16 +46,18 @@
 				</script>
 			</header>
 			<!-- 검색 박스 -->
-			<form action="${pageContext.request.contextPath}/admin/search" method="get">
-		    <input type="hidden" name="type" value="event" />
-		    <input type="text" name="keyword" placeholder="검색어를 입력하세요" />
-		    <button type="submit">조회</button>
-		</form>
+			            <form class="search-box" action="${pageContext.request.contextPath}/admin/search"
+				method="get">
+				<input type="hidden" name="type" value="event" /> <input
+					type="text" name="keyword" placeholder="검색어를 입력하세요"
+					value="${param.keyword}" />
+				<button type="submit">검색</button>
+			</form>
 
 
 			<!-- 테이블 -->
-			<form action="<%=request.getContextPath()%>/noticeDelete" method="post"
-				onsubmit="return confirm('선택한 항목을 삭제하시겠습니까?');">
+			<form action="<%=request.getContextPath()%>/noticeDelete"
+				method="post" onsubmit="return confirm('선택한 항목을 삭제하시겠습니까?');">
 				<table>
 					<thead>
 						<tr>
@@ -85,7 +89,7 @@
 						<%} %>
 						<%} %>
 					</tbody>
-					
+
 				</table>
 
 				<!-- 액션 버튼 -->
@@ -95,33 +99,35 @@
 			</form>
 
 			<!-- 페이지네이션 -->
-				<div align="center" class="pagination">
-			    <% if (currentPage > 1) { %>
-			        <!-- 이전 페이지 이동 -->
-			        <a href="<%= request.getContextPath() %>/admin/elist?cpage=1">&lt;&lt;</a>
-			        <a href="<%= request.getContextPath() %>/admin/elist?cpage=<%= currentPage - 1 %>">&lt;</a>
-			    <% } %>
-			
-			    <% for (int p = startPage; p <= endPage; p++) { %>
-			        <a href="<%= request.getContextPath() %>/admin/elist?cpage=<%= p %>"
-			           class="<%= (currentPage == p) ? "active" : "" %>">
-			            <%= p %>
-			        </a>
-			    <% } %>
-			
-			    <% if (currentPage < maxPage) { %>
-			        <!-- 다음 페이지 이동 -->
-			        <a href="<%= request.getContextPath() %>/admin/elist?cpage=<%= currentPage + 1 %>">&gt;</a>
-			        <a href="<%= request.getContextPath() %>/admin/elist?cpage=<%= maxPage %>">&gt;&gt;</a>
-			    <% } %>
+			<div align="center" class="pagination">
+				<% if (currentPage > 1) { %>
+				<!-- 이전 페이지 이동 -->
+				<a href="<%= request.getContextPath() %>/admin/elist?cpage=1">&lt;&lt;</a>
+				<a
+					href="<%= request.getContextPath() %>/admin/elist?cpage=<%= currentPage - 1 %>">&lt;</a>
+				<% } %>
+
+				<% for (int p = startPage; p <= endPage; p++) { %>
+				<a href="<%= request.getContextPath() %>/admin/elist?cpage=<%= p %>"
+					class="<%= (currentPage == p) ? "active" : "" %>"> <%= p %>
+				</a>
+				<% } %>
+
+				<% if (currentPage < maxPage) { %>
+				<!-- 다음 페이지 이동 -->
+				<a
+					href="<%= request.getContextPath() %>/admin/elist?cpage=<%= currentPage + 1 %>">&gt;</a>
+				<a
+					href="<%= request.getContextPath() %>/admin/elist?cpage=<%= maxPage %>">&gt;&gt;</a>
+				<% } %>
 			</div>
- 
-        <script>
+
+			<script>
         	function movePage(cpage){
         		location.assign('<%= contextPath %>/admin/elist/list?cpage='+cpage);
         	}
         </script>
-	<script>
+			<script>
     function toggleAllCheckboxes(source) {
         const checkboxes = document.querySelectorAll('input[name="boardNo"]');
         checkboxes.forEach(checkbox => {

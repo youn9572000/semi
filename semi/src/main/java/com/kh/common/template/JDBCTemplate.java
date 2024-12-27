@@ -14,8 +14,8 @@ public class JDBCTemplate {
 		// 커넥션풀을 통해 생성하고자 하는 커넥션 옵션 기술
 		dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
 		dataSource.setUrl("jdbc:oracle:thin:@localhost:1521:xe");
-		dataSource.setUsername("C##SEMI");
-		dataSource.setPassword("SEMI");
+		dataSource.setUsername("C##SEMI2");
+		dataSource.setPassword("1234");
 		dataSource.setInitialSize(10);// 초기 커넥션풀(커넥션 관리하는 저장소) 사이즈
 		dataSource.setMaxTotal(50);
 		dataSource.setDefaultAutoCommit(false);// 자동커밋 false
