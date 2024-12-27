@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+	<entry key="selectNotice">
+		SELECT *
+    FROM (
+        SELECT ROWNUM AS RNUM, A.*
+        FROM (
+            SELECT B.BOARD_NO, M.USER_ID AS BOARD_WRITER, B.BOARD_TITLE,
+                   B.COUNT, B.CREATE_DATE, B.BOARD_CATEGORY, B.PLUS
+            FROM BOARD B
+            JOIN MEMBER M ON B.BOARD_WRITER = M.USER_NO
+            WHERE B.BOARD_STATUS = 'Y'
+            AND B.BOARD_CATEGORY = 3
+            ORDER BY B.BOARD_NO DESC
+        ) A
+    )
+    WHERE RNUM BETWEEN ? AND ?
+
+	</entry>
+	
+	<entry key="selectNoticeCount">
+		SELECT COUNT(*)
+		FROM BOARD
+		WHERE BOARD_CATEGORY = 3
+	</entry>
+	
+	<entry key=""></entry>
+	<entry key=""></entry>
+	<entry key=""></entry>
+	<entry key=""></entry>
+	<entry key=""></entry>
+	<entry key=""></entry>
+	<entry key=""></entry>
+
+</properties>
