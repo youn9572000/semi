@@ -36,7 +36,7 @@ public class Login extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
+    	request.setCharacterEncoding("UTF-8");
 
         // 1) 파라미터 추출
         String userId = request.getParameter("userId");
@@ -58,8 +58,16 @@ public class Login extends HttpServlet {
             session.setAttribute("loginUser", m);
             session.setAttribute("alertMsg", "로그인 성공!");
 
-            // 메인 페이지(또는 원하는 경로)로 이동 (Redirect)
-            response.sendRedirect(request.getContextPath() + "/index.jsp");
+            // 사용자 번호(user_no)에 따라 페이지 이동
+            int userNo = m.getUserNo(); // Member 객체에서 userNo를 가져옴
+            if (userNo >= 1 && userNo <= 5) {
+                // 특정 번호 범위에 해당하는 사용자를 이동
+                response.sendRedirect(request.getContextPath() + "/views/adminPage/admin/MainPage.jsp");
+            } else {
+                // 일반 사용자는 메인 페이지로 이동
+                response.sendRedirect(request.getContextPath() + "/index.jsp");
+            }
         }
     }
+    
 }
