@@ -64,7 +64,7 @@ public class BlockUserController extends HttpServlet {
 
         // DB 업데이트
         for (BlockMemberDTO user : users) {
-            int result = service.blockUsers(user.getMember().getUserId(), user.getBlock().getReason());
+            int result = service.blockUsers(user.getMember().getUserId(), user.getBlock().getReason(), user.getBlock().getBlockDay());
             if (result <= 0) {
                 isSuccess = false;
                 break;

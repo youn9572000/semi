@@ -55,10 +55,11 @@
 				<form action="<%= request.getContextPath() %>/admin/SearchUser"
 					method="get" id="searchForm">
 					<div class="search-box">
-						<input type="text" id="search-id" name="searchId"
-							placeholder="아이디 입력"> <input type="hidden" name="filter"
-							id="filterInput" value="<%= filter != null ? filter : "all" %>">
-
+					
+						<input type="text" id="search-id" name="searchId" placeholder="아이디 입력"> 
+						<%-- <input type="hidden" name="filter" id="filterInput" value="<%= filter != null ? filter : "all" %>"> --%>
+						
+						
 						<input type="hidden" name="cpage"
 							value="<%= pi.getCurrentPage() %>">
 
@@ -67,13 +68,13 @@
 					</div>
 				</form>
 
-				<script>
+<!-- 				<script>
 				    // 검색 폼 제출 전 처리 (검색어가 비어 있으면 searchId 제거)
 				    function submitSearchForm() {
 				        const searchInput = document.getElementById('search-id');
 				        const filterInput = document.getElementById('filterInput');
 				        const form = document.getElementById('searchForm');
-				        
+				        console.log("fliter: " + filter);
 				        console.log("Search Input Value:", searchInput.value);
 				        
 				        // 검색어가 비어 있을 경우 searchId 파라미터 제거
@@ -82,9 +83,9 @@
 				        }
 				        form.submit();
 				    }
-				</script>
+				</script> -->
 
-
+				<!-- 회원 필터링 셀렉트박스 기능 -->
 				<form action="<%= request.getContextPath() %>/admin/MemberBlock"
 					method="get" id="filterForm">
 					<div class="sort-box">
@@ -95,8 +96,8 @@
 								<%= "blocked".equals(filter) ? "selected" : "" %>>차단회원</option>
 							<option value="unblocked"
 								<%= "unblocked".equals(filter) ? "selected" : "" %>>차단안된회원</option>
-						</select> <input type="hidden" name="searchId"
-							value="<%= request.getParameter("searchId") != null ? request.getParameter("searchId") : "" %>">
+						</select> <%-- <input type="hidden" name="searchId"
+							value="<%= request.getParameter("searchId") != null ? request.getParameter("searchId") : "" %>"> --%>
 						<input type="hidden" name="cpage"
 							value="<%= pi.getCurrentPage() %>">
 						<%-- <input type="hidden" name="cpage" value="<%= currentPage %>"> --%>
@@ -109,14 +110,15 @@
 				        document.getElementById('filterForm').submit();
 				    }
 				</script>
-
+				
+				<!-- 회원 차단, 해제 버튼 -->
 				<div class="action-buttons">
 					<button type="button" class="block-btn" onclick="showBlockAlert()">차단</button>
-					<button type="button" class="unblock-btn">해제</button>
+					<button type="button" class="unblock-btn" onclick="showReleaseAlert()">해제</button>
 				</div>
 			</div>
 
-			<!-- 커스텀 알럿 모달 -->
+			<!-- 차단 알럿 모달 -->
 			<div class="custom-alert" id="customAlert">
 				<h2>차단 일수 설정</h2>
 				<ul>
@@ -131,6 +133,17 @@
 				<button onclick="closeAlert()">취소</button>
 			</div>
 			<div class="overlay" id="overlay"></div>
+			
+			<!-- 차단해제 알럿 모달 -->
+			<div class="custom-alert" id="customAlert2">
+				<h2>회원 차단해제 확인</h2>
+				<ul>
+					<li>선택하신 회원의 차단을 해제하시겠습니까?</li>				
+				</ul>
+				<button id="confirmRelease">확인</button>
+				<button onclick="closeAlert()">취소</button>
+			</div>
+			<div class="overlay" id="overlay2"></div>
 
 			<!-- 차단사유 선택 체크박스 하나만 선택되게 하는 기능 -->
 			<script>
@@ -144,7 +157,8 @@
 			        });
 			    });
 			</script>
-
+			
+			<!-- 회원 차단/해제 데이터 저장 및  부분 -->
 			<script>
 			    // 행 데이터 저장용 배열
 			    let selectedUsers  = [];
@@ -178,21 +192,41 @@
 			            alert("차단할 회원을 선택하세요.");
 			            return;
 			        }
+			        // 모달 제목과 버튼 텍스트를 차단 관련으로 변경
+			        /* document.getElementById("alertTitle").textContent = "차단 일수 설정";
+			        document.getElementById("confirmBlock").textContent = "차단 확인"; */
+			        
 			        document.getElementById("customAlert").style.display = "block";
 			        document.getElementById("overlay").style.display = "block";
+			    }
+			    
+			    function showReleaseAlert() {
+			        if (selectedUsers.length === 0) {
+			            alert("차단 해제할 회원을 선택하세요.");
+			            return;
+			        }
+			     	// 모달 제목과 버튼 텍스트를 해제 관련으로 변경
+			        /* document.getElementById("alertTitle").textContent = "차단 해제";
+			        document.getElementById("confirmBlock").textContent = "차단 해제 확인"; */
+			        
+			        document.getElementById("customAlert2").style.display = "block";
+			        document.getElementById("overlay2").style.display = "block";
 			    }
 
 
 			    function closeAlert() {
 			    	document.getElementById("customAlert").style.display = "none";
 			    	document.getElementById("overlay").style.display = "none";
+			        document.getElementById("customAlert2").style.display = "none";
+			        document.getElementById("overlay2").style.display = "none";
 			    }
 			    </script>
-			    	
-				<script>
+
+			<script>
 			 // DOMContentLoaded 내에서 이벤트 리스너 추가
 			    document.addEventListener('DOMContentLoaded', function () {
 			        const confirmBlockBtn = document.getElementById('confirmBlock');
+			        const confirmReleaseBtn = document.getElementById('confirmRelease');
 			        
 			        // confirmBlock 버튼에 이벤트 추가
 			        if (confirmBlockBtn) {
@@ -208,18 +242,21 @@
 			                    alert("차단할 사유를 선택하세요.");
 			                    return;
 			                }
+						  		  
 
 					const [days, reason] = selectedOption.value.split('-');
 					
 		            // 선택된 회원에 대한 차단 정보 업데이트 (DOM 조작)
 		            selectedUsers.forEach(user => {
-		                console.log("현재 조작 중인 행: ", user.rowElement);
-		                console.log("userId: ", user.userId);
-		                user.rowElement.children[2].textContent = reason;  // 차단 사유 업데이트
+		                /* console.log("현재 조작 중인 행: ", user.rowElement);
+		                console.log("userId: ", user.userId); */
+		                user.rowElement.children[2].textContent = reason;  // 차단 사유 업데이트	  
+		                user.rowElement.children[3].textContent = days; // 차단 일수 업데이트
 		            });
 
+		            
 		            // ====== [수정된 부분 - AJAX 요청 전송] ======
-		            fetch('<%= request.getContextPath() %>/admin/blockUser', {
+		            fetch('<%=request.getContextPath()%>/admin/blockUser', {
 		                method: 'POST',
 		                headers: {
 		                    'Content-Type': 'application/json'
@@ -229,7 +266,8 @@
 		                    	userId: user.userId
 		                    },
 		                    block: {
-			                    reason: reason		                    	
+			                    reason: reason,		                    	
+		                    	blockDay: days
 		                    }
 		                })))
 		            })
@@ -251,12 +289,60 @@
 		            closeAlert();
 		        });
 		    }
+			        
 		});
-		    
+
 		</script>
-	
+		
+		
+		
+		
+		
+		<!-- 회원 차단해제  -->
+		<script>
+			 // DOMContentLoaded 내에서 이벤트 리스너 추가
+			    document.addEventListener('DOMContentLoaded', function () {
+			        const confirmReleaseBtn = document.getElementById('confirmRelease');
+			        
+			        // confirmRelease 버튼에 이벤트 추가
+			        if (confirmReleaseBtn) {
+			        	confirmReleaseBtn.addEventListener('click', function () {
+			            	
+		            
+		            // ====== [AJAX 요청 전송] ======
+		            fetch('<%=request.getContextPath()%>/admin/releaseUser', {
+		                method: 'POST',
+		                headers: {
+		                    'Content-Type': 'application/json'
+		                },
+		                body: JSON.stringify(selectedUsers.map(user => ({
+		                    member: {
+		                    	userId: user.userId
+		                    }
+		                })))
+		            })
+		            .then(response => response.json())
+		            .then(data => {
+		                if (data.success) {
+		                    alert("회원 차단해제 완료");
+		                    location.reload();
+		                } else {
+		                    alert("회원 차단해제 실패");
+		                }
+		            })
+ 		            .catch(error => {
+		                console.error("서버 오류 발생: ", error);
+		                alert("서버에서 문제가 발생했습니다.");
+		            }); 
+		            // ========================================
+		            
+		            closeAlert();
+		        });
+		    }
+			        
+		});
 
-
+		</script>
 
 			<!-- 회원차단 테이블 -->
 			<table class="list-area">

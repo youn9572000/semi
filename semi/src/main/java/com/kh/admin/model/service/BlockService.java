@@ -38,10 +38,10 @@ public class BlockService {
 		
 	}
 
-	public int blockUsers(String userId, String blockReason) {
+	public int blockUsers(String userId, String reason, int blockDays) {
         Connection conn = getConnection();
         
-        int result = dao.updateBlock(conn, userId, blockReason);
+        int result = dao.updateBlock(conn, blockDays, userId, reason);
         
         if (result > 0) {
         System.out.println("DB 업데이트 결과: " + result);
@@ -113,6 +113,25 @@ public class BlockService {
 		close(conn);
 		
 		return listCount;
+	}
+
+	public int releaseUser(String userId) {
+		Connection conn = getConnection();
+		
+		int result = dao.releaseUser(conn, userId);
+		
+		
+		if(result > 0) {
+			commit(conn);
+		} else {
+			rollback(conn);
+		}
+		
+		close(conn);
+		
+		return result;
+		
+	
 	}
 
 
