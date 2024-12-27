@@ -94,7 +94,7 @@ public class BlockDao {
 
 	}
 
-	public int updateBlock(Connection conn, String userId, String blockReason) {
+	public int updateBlock(Connection conn, int blockDays, String userId, String blockReason) {
 		PreparedStatement pstmt = null;
 		String sql = prop.getProperty("updateBlock");
 		int result = 0;
@@ -102,9 +102,11 @@ public class BlockDao {
 		try {
 			pstmt = conn.prepareStatement(sql);
 
-                //pstmt.setInt(1, Integer.parseInt(blockDays));
+                //
                 pstmt.setString(1, blockReason);
-                pstmt.setString(2, userId);
+                pstmt.setInt(2, blockDays);
+                pstmt.setString(3, userId);
+                pstmt.setString(4, userId);
                 
                 result = pstmt.executeUpdate();
                 
@@ -293,6 +295,28 @@ public class BlockDao {
 		}
 		
 		return result;
+	}
+
+	public int releaseUser(Connection conn, String userId) {
+		PreparedStatement pstmt = null;
+		String sql = prop.getProperty("releaseUser");
+		int result = 0;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, userId);
+			
+			result = pstmt.executeUpdate();
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			close(pstmt);
+		}
+		return result;
+		
 	}
 
 

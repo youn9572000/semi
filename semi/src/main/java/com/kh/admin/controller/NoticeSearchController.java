@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.kh.admin.model.service.AdminSearchService;
 import com.kh.admin.model.vo.Board;
 
 /**
@@ -64,7 +63,7 @@ public class NoticeSearchController extends HttpServlet {
             request.setAttribute("list", searchResults);
         }
         request.getRequestDispatcher(viewPath).forward(request, response);
-    
+    }
 	}
 
 	/**

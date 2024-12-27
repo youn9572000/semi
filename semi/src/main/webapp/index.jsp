@@ -1,115 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ page import="com.kh.user.model.vo.Member" %>	
-<%
-String contextPath = request.getContextPath();
-
-
-%>
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>편리하조 Main Page</title>
-
-<link rel="stylesheet" href="resources/css/dropdown.css" type="text/css">
-<link rel="stylesheet" href="resources/css1/idCheck.css" type="text/css">
-<!-- Reset CSS 연결 -->
-<link rel="stylesheet" href="resources/css1/reset.css" type="text/css">
-<!-- Main Style CSS 연결 -->
-<link rel="stylesheet" href="resources/css1/style.css" type="text/css">
-
-<!-- 부트스트랩 CSS 연결 -->
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet"
-	integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-	crossorigin="anonymous">
-
-<!-- 부트스트랩 JS 연결 -->
-<script
-	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-	crossorigin="anonymous"></script>
-
-<!-- 제이쿼리 라이브러리 링크 -->
-<script src="resources/js1/jquery-1.9.1.min.js"></script>
-
-<!-- bx슬라이더 CSS 및 JS -->
-<link rel="stylesheet" href="resources/js1/jquery.bxslider.css">
-<script src="resources/js1/jquery.bxslider.js"></script>
-
-<!-- bx슬라이더 및 기타 제이쿼리 설정 -->
-<script>
-        $(document).ready(function () {
-            $('.slider').bxSlider({
-                auto: true,
-                speed: 2000,
-            });
-
-            // 모바일 gnb 토글
-            $(".menu-toggle-btn").click(function () {
-                $(".gnb").stop().slideToggle("fast");
-            });
-        });
-    </script>
-
+<title>Insert title here</title>
 </head>
 <body>
-	<!-- header -->
-	<div id="header_wrap">
-		<div id="header">
-			<h1 class="logo">
-				<a href="index.jsp"><img src="resources/img1/편의점 로고 예시1.png"
-					alt="편리하조 로고"></a>
-			</h1>
-			<ul class="gnb">
-				<li><a
-					href="<%=request.getContextPath()%>/views/product/gs.jsp">GS25</a></li>
-				<li><a
-					href="<%=request.getContextPath()%>/views/product/cu.jsp">CU</a></li>
-				<li><a
-					href="<%=request.getContextPath()%>/views/product/seven.jsp">7-ELEVEN</a></li>
-				<li class="menu-item" data-menu="게시판"><a>게시판</a></li>
-				<li class="menu-item" data-menu="고객센터"><a>고객센터</a></li>
-			</ul>
-
-			<!-- 모바일 gnb 토글버튼 -->
-			<span class="menu-toggle-btn"> <span></span> <span></span> <span></span>
-			</span>
-
-			<!-- Login, Signup, Mypage Section -->
-			<div class="user-menu">
-				<%
-				// 세션에서 로그인 사용자 확인
-				Member loginUser = (Member) session.getAttribute("loginUser");
-				%>
-				<%
-				if (loginUser != null) {
-				%>
-				<!-- 로그인 상태 -->
-				<span>안녕하세요, <%=loginUser.getUserId()%>님!
-				</span> <a href="<%=request.getContextPath()%>/member/logout"
-					class="icon logout">로그아웃</a> <a
-					href="<%=request.getContextPath()%>/views/userPage/member/mypage.jsp"
-					class="icon mypage">마이페이지</a>
-				<%
-				} else {
-				%>
-				<!-- 비로그인 상태 -->
-				<a
-					href="<%=request.getContextPath()%>/views/userPage/member/login.jsp"
-					class="icon login">로그인</a> <a
-					href="<%=request.getContextPath()%>/views/userPage/member/signup.jsp"
-					class="icon signup">회원가입</a>
-				<%
-				}
-				%>
-			</div>
-		</div>
-	</div>
-	<!-- //header -->
 
 	<!-- visual -->
 	<div id="visual">
@@ -327,7 +223,4 @@ String contextPath = request.getContextPath();
 	</script>
 	
 </body>
-
-
-
 </html>

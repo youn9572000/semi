@@ -12,21 +12,25 @@
 </head>
 <body>
 	
-       <!-- 좌측 메뉴 --> 
-        <aside class="sidebar">
-            <img src="<%= contextPath %>/resources/편리로고.png" alt="편리logo">
-            <ul>
-                <li class="menu-item" data-menu="회원관리">회원관리</li>
-                <li class="menu-item" data-menu="게시글관리">게시글관리</li>
-                <li class="menu-item" data-menu="꾸미기">꾸미기</li>
-              <li class="menu-item" onclick="window.location.href='<%= contextPath %>/admin/report'" style="cursor: pointer;">신고관리</li>
-              <li class="menu-item" data-menu="상품관리"
+       <!-- 좌측 메뉴 -->
+	<aside class="sidebar">
+		<a href="<%=contextPath%>/index.jsp"> <img
+			src="<%=contextPath%>/resources/편리로고.png" alt="편리logo">
+		</a>
+		<ul>
+			<li class="menu-item" data-menu="회원관리">회원관리</li>
+			<li class="menu-item" data-menu="게시글관리">게시글관리</li>
+			<li class="menu-item" data-menu="꾸미기">꾸미기</li>
+			<li class="menu-item"
+				onclick="window.location.href='<%= contextPath %>/admin/report'"
+				style="cursor: pointer;">신고관리</li>
+			<li class="menu-item" data-menu="상품관리"
 				onclick="location.href='<%=contextPath%>/views/adminPage/admin/productManagement.jsp'">상품관리</a>
 			</li>
-            </ul>
-        </aside>
-	
-<script>
+		</ul>
+	</aside>
+
+	<script>
     // 대메뉴와 소메뉴 매핑
     const menuData = {
         "회원관리": [
@@ -39,7 +43,7 @@
             { name: "행사게시판 관리", url: "<%= contextPath %>/admin/elist" }
         ],
         "꾸미기": [
-            { name: "스킨편집", url: "editSkin.jsp" },
+            { name: "스킨편집", url: "<%=contextPath%>/views/adminPage/admin/editSkin.jsp" },
             { name: "메뉴", url: "manageMenu.jsp" }
         ]
     };

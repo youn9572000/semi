@@ -269,7 +269,13 @@
 		SET (BLOCK_NO) = 
 		    (SELECT BLOCK_NO
 		     FROM BLOCK b
-		     WHERE BLOCK_REASON = ?)
+		     WHERE BLOCK_REASON = ?),
+			 BLOCK_END = 
+				(SELECT SYSDATE + ?
+                 FROM BLOCK b
+                 RIGHT JOIN MEMBER m USING(BLOCK_NO)
+                 WHERE m.USER_ID = ?),
+             MEMBER_STATUS = 'N'
 		WHERE USER_ID = ?
 	</entry>
 	
@@ -331,7 +337,52 @@
 		FROM MEMBER M
 		LEFT JOIN BLOCK B USING(BLOCK_NO)
 	</entry>
+	
+	<entry key="releaseUser">
+		UPDATE MEMBER 
+		SET BLOCK_NO = NULL, MEMBER_STATUS = 'Y'
+		WHERE USER_ID = ?
+	</entry>
    
+
+   <entry key="searchBaord">
+  SELECT * FROM (
+            SELECT ROWNUM AS RN, T.* 
+            FROM (
+                SELECT * 
+                FROM BOARD 
+                WHERE BOARD_CATEGORY = ? 
+                AND (BOARD_TITLE LIKE ? OR BOARD_CONTENT LIKE ? OR BOARD_WRITER LIKE ?) 
+                ORDER BY BOARD_NO DESC
+            ) T
+        )
+        WHERE RN BETWEEN ? AND ?
+   </entry>
+   <entry key="searchBoardList">
+    SELECT COUNT(*) 
+        FROM BOARD 
+        WHERE BOARD_CATEGORY = ? 
+        AND (BOARD_TITLE LIKE ? OR BOARD_CONTENT LIKE ? OR BOARD_WRITER LIKE ?)
+   </entry>
+   <entry key="mboardDelete">
+   SELECT *
+    FROM (
+        SELECT ROWNUM AS RNUM, A.*
+        FROM (
+            SELECT USER_NO, USER_ID, ENROLL_DATE, STATUS
+            FROM MEMBER
+            WHERE STATUS = 'ACTIVE'
+            ORDER BY ENROLL_DATE DESC
+        ) A
+    )
+    WHERE RNUM BETWEEN ? AND ?
+   </entry>
+   <entry key="deleteMemberCount">
+ 	 SELECT COUNT(*)
+    FROM MEMBER
+   </entry>
+
+
 </properties>
 
 
