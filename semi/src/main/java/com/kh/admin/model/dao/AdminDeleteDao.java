@@ -4,7 +4,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+
+import com.kh.admin.model.vo.Member;
+
 import static com.kh.common.template.JDBCTemplate.*;
 
 public class AdminDeleteDao {
@@ -115,6 +122,63 @@ public class AdminDeleteDao {
 	    }
 	    return result;
 	}
+
+
+
+	public int getMemberCount(Connection conn) {
+		int listCount = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		String sql = prop.getProperty("deleteMemberCount");
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			rset = pstmt.executeQuery();
+			if (rset.next()) {
+				listCount = rset.getInt(1);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			close(rset);
+			close(pstmt);
+		}
+		return listCount;
+	}
+
+	public List<Member> selectMemberList(Connection conn, int startRow, int endRow) {
+		List<Member> list = new ArrayList<>();
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		String sql = prop.getProperty("deleteMemeberList");
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, startRow);
+			pstmt.setInt(2, endRow);
+			
+			rset = pstmt.executeQuery();
+			while (rset.next()) {
+				Member m = Member.builder()
+								 .userNo(rset.getInt("USER_NO"))
+								 .userId(rset.getString("USER_ID"))
+								 .enrollDate(rset.getDate("ENROLL_DATE"))
+								 .memberStatus(rset.getString("MEMBER_STATUS"))
+								 .build();
+				
+				list.add(m);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			close(rset);
+			close(pstmt);
+		}
+		return list;
+	}
+
 
 
 

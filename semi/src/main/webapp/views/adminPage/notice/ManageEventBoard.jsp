@@ -31,7 +31,7 @@
 				<div class="admin-icons">
 					<a href="#" class="tooltip" id="logout-btn"> <img
 						src="<%=contextPath%>/resources/logout이미지.png" alt="로그아웃">
-					</a> <a href="#" class="tooltip" id="home-btn"> <img
+					</a> <a href="<%= contextPath %>/views/adminPage/admin/MainPage.jsp" class="tooltip" id="home-btn"> <img
 						src="<%=contextPath%>/resources/mainPage이동.png" alt="메인페이지 이동"
 						id="home">
 					</a>
