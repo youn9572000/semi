@@ -292,7 +292,7 @@ String contextPath = request.getContextPath();
 	<script>// 대메뉴와 소메뉴 매핑
 	const menuData = {
 		    "게시판": [
-		        { name: "공지사항", url: "<%=request.getContextPath()%>/views/userPage/board/boardNotice.jsp" },
+		        { name: "공지사항", url: "<%=request.getContextPath()%>/board/notice" },
 		        { name: "자유게시판", url: "<%=request.getContextPath()%>/views/userPage/board/boardFree.jsp" },
 		        { name: "행사게시판", url: "<%=request.getContextPath()%>/views/userPage/board/boardEvent.jsp" }
 		    ],

@@ -17,7 +17,7 @@ public class Board {
 	private AdminNoticeCategory category;
 	private String boardTitle;
 	private String boardContent;
-	private int puls;
+	private int plus;
 	private int count;
 	private Date createDate;
 	private String boardSatus;

@@ -134,7 +134,7 @@
 }
 
 .notice-table th:nth-child(2), /* 제목 */ .notice-table td:nth-child(2) {
-	width: 40%; /* 가장 넓게 설정 */
+	width: 30%; /* 가장 넓게 설정 */
 }
 
 .notice-table th:nth-child(3), /* 작성자 */ .notice-table td:nth-child(3) {
@@ -145,7 +145,11 @@
 	width: 20%;
 }
 
-.notice-table th:nth-child(5), /* 조회수 */ .notice-table td:nth-child(5) {
+.notice-table th:nth-child(5), /* 추천수 */ .notice-table td:nth-child(5) {
+	width: 10%;
+}
+
+.notice-table th:nth-child(6), /* 조회수 */ .notice-table td:nth-child(3) {
 	width: 10%;
 }
 
@@ -163,12 +167,14 @@
 	background-color: white;
 	cursor: pointer;
 	border-radius: 4px;
+	color: #333; /* 항상 보이도록 글자 색상 추가 */
 }
 
 .page-btn.active {
 	background-color: #6a5acd;
 	color: white;
 }
+
 
 /* 정렬 드롭다운 */
 .sort-dropdown {
@@ -187,35 +193,74 @@
 	font-size: 0.9rem;
 }
 
+/* 드롭다운 옵션 */
 .sort-options {
-	display: none;
-	position: absolute;
-	background-color: white;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	z-index: 10;
-	width: 150px;
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    margin-top: 5px;
+    z-index: 1000;
+    overflow: hidden;
+    min-width: 120px;
 }
 
-.sort-options li {
-	padding: 0.5rem;
-	cursor: pointer;
-	font-size: 0.9rem;
-	color: #333;
+.sort-options a {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
 }
 
-.sort-options li:hover {
-	background-color: #f0f0f0;
+.sort-options a:hover {
+    background-color: #f1f1f1;
+    color: #007bff;
+}
+
+.sort-options.show {
+    display: block;
+}
+
+/* 활성화된 정렬 옵션 */
+.sort-options a.active {
+    font-weight: bold;
+    color: #007bff;
+    background-color: #e6f2ff;
 }
 
 /* 드롭다운 활성화 */
 .sort-dropdown:hover .sort-options {
 	display: block;
 }
+
+.sorting a {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 8px;
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
 
 
 
