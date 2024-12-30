@@ -317,10 +317,12 @@ String contextPath = request.getContextPath();
                     submenu.appendChild(li);
                 });
 
+
                 // 대메뉴 아래에 소메뉴 추가
                 menuItem.appendChild(submenu);
             }
         });
     </script>
+
 </body>
 </html>
