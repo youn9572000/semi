@@ -35,7 +35,7 @@
     const menuData = {
         "회원관리": [
             { name: "회원 차단", url: "<%= contextPath %>/admin/MemberBlock" },
-            { name: "회원 삭제", url: "<%= contextPath %>/views/adminPage/admin/MemberDelete.jsp" }
+            { name: "회원 삭제", url: "<%= contextPath %>/admin/MemberDelete" }
         ],
         "게시글관리": [
             { name: "공지사항 관리", url: "<%= contextPath %>/admin/mlist" },

@@ -1,6 +1,6 @@
 package com.kh.user.model.vo;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,11 +10,12 @@ import lombok.Setter;
 
 public class Review {
     private int reviewNo;
-    private String reviewWriter;
+    private int reviewWriter;
     private int productNo;
     private String reviewContent;
-    private Date reviewDate;
+    private Timestamp reviewDate;
     private int reviewScore;
+    private char reviewStatus;
 		
 	}
     // Getters and Setters

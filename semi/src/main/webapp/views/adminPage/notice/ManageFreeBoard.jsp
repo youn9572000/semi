@@ -3,13 +3,13 @@
 <%@ page
 	import="java.util.List, com.kh.admin.model.vo.Board, com.kh.common.model.vo.PageInfo"%>
 <%
-	List<Board> list = (List<Board>)request.getAttribute("list");
-	PageInfo pi = (PageInfo)request.getAttribute("pi");
-	
-	int currentPage = pi.getCurrentPage();
-	int startPage = pi.getStartPage();
-	int endPage = pi.getEndPage();
-	int maxPage = pi.getMaxPage();
+List<Board> list = (List<Board>) request.getAttribute("list");
+PageInfo pi = (PageInfo) request.getAttribute("pi");
+
+int currentPage = pi.getCurrentPage();
+int startPage = pi.getStartPage();
+int endPage = pi.getEndPage();
+int maxPage = pi.getMaxPage();
 %>
 <html lang="ko">
 <head>
@@ -32,7 +32,8 @@
 				<div class="admin-icons">
 					<a href="#" class="tooltip" id="logout-btn"> <img
 						src="<%=contextPath%>/resources/logout이미지.png" alt="로그아웃">
-					</a> <a href="<%= contextPath %>/views/adminPage/admin/MainPage.jsp" class="tooltip" id="home-btn"> <img
+					</a> <a href="<%= contextPath %>/views/adminPage/admin/MainPage.jsp"
+						class="tooltip" id="home-btn"> <img
 						src="<%=contextPath%>/resources/mainPage이동.png" alt="메인페이지 이동"
 						id="home">
 					</a>
@@ -45,16 +46,18 @@
 				</script>
 			</header>
 			<!-- 검색 박스 -->
-					<form action="${pageContext.request.contextPath}/admin/search" method="get">
-		    <input type="hidden" name="type" value="free" />
-		    <input type="text" name="keyword" placeholder="검색어를 입력하세요" />
-		    <button type="submit">조회</button>
-		</form>
+			<form class="search-box"
+				action="${pageContext.request.contextPath}/admin/search"
+				method="get">
+				<input type="hidden" name="type" value="free" /> <input type="text"
+					name="keyword" placeholder="검색어를 입력하세요" value="${param.keyword}" />
+				<button type="submit">검색</button>
+			</form>
 
 
 			<!-- 테이블 -->
-			<form action="<%=request.getContextPath()%>/noticeDelete" method="post"
-				onsubmit="return confirm('선택한 항목을 삭제하시겠습니까?');">
+			<form action="<%=request.getContextPath()%>/noticeDelete"
+				method="post" onsubmit="return confirm('선택한 항목을 삭제하시겠습니까?');">
 				<table>
 					<thead>
 						<tr>
@@ -76,17 +79,17 @@
 						<%for(Board b : list){ %>
 						<tr>
 							<td><input type="checkbox" name="fboardNo"
-								value="<%= b.getBoardNo() %>"></td>
-							<td><%= b.getBoardNo() %></td>
-							<td><%= b.getBoardTitle() %></td>
-							<td><%= b.getBoardWriter() %></td>
-							<td><%= b.getCreateDate() %></td>
-							<td><%= b.getCount() %></td>
+								value="<%=b.getBoardNo()%>"></td>
+							<td><%=b.getBoardNo()%></td>
+							<td><%=b.getBoardTitle()%></td>
+							<td><%=b.getBoardWriter()%></td>
+							<td><%=b.getCreateDate()%></td>
+							<td><%=b.getCount()%></td>
 						</tr>
 						<%} %>
 						<%} %>
 					</tbody>
-					
+
 				</table>
 
 				<!-- 액션 버튼 -->
@@ -95,31 +98,29 @@
 				</div>
 			</form>
 
-			<!-- 페이지네이션 -->
-				<div align="center" class="pagination">
-			    <% if (currentPage > 1) { %>
-			        <!-- 이전 페이지 이동 -->
-			        <a href="<%= request.getContextPath() %>/admin/flist?cpage=1">&lt;&lt;</a>
-			        <a href="<%= request.getContextPath() %>/admin/flist?cpage=<%= currentPage - 1 %>">&lt;</a>
-			    <% } %>
-			
-			    <% for (int p = startPage; p <= endPage; p++) { %>
-			        <a href="<%= request.getContextPath() %>/admin/flist?cpage=<%= p %>"
-			           class="<%= (currentPage == p) ? "active" : "" %>">
-			            <%= p %>
-			        </a>
-			    <% } %>
-			
-			    <% if (currentPage < maxPage) { %>
-			        <!-- 다음 페이지 이동 -->
-			        <a href="<%= request.getContextPath() %>/admin/flist?cpage=<%= currentPage + 1 %>">&gt;</a>
-			        <a href="<%= request.getContextPath() %>/admin/flist?cpage=<%= maxPage %>">&gt;&gt;</a>
-			    <% } %>
-			</div>
+			<!-- 페이징 네비게이션 -->
+            <div class="pagination">
+                <c:if test="${pi.startPage > 1}">
+                    <a
+                        href="${pageContext.request.contextPath}/admin/search?type=free&keyword=${param.keyword}&page=${pi.startPage - 1}"
+                        class="prev">이전</a>
+                </c:if>
+                <c:forEach var="i" begin="${pi.startPage}" end="${pi.endPage}">
+                    <a
+                        href="${pageContext.request.contextPath}/admin/search?type=free&keyword=${param.keyword}&page=${i}"
+                        class="${i == pi.currentPage ? 'active' : ''}"> ${i} </a>
+                </c:forEach>
+                <c:if test="${pi.endPage < pi.maxPage}">
+                    <a
+                        href="${pageContext.request.contextPath}/admin/search?type=free&keyword=${param.keyword}&page=${pi.endPage + 1}"
+                        class="next">다음</a>
+                </c:if>
+            </div>
  
         <script>
+            
         	function movePage(cpage){
-        		location.assign('<%= contextPath %>/admin/flist/list?cpage='+cpage);
+                location.assign('<%=contextPath%>/admin/flist/list?cpage='+cpage);
         	}
         </script>
 	<script>

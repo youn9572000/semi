@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.kh.admin.model.dto.BlockMemberDTO;
 import com.kh.admin.model.service.BlockService;
+import com.kh.admin.model.service.DeleteService;
 import com.kh.common.model.vo.PageInfo;
 
 /**
@@ -44,26 +45,20 @@ public class MemberBlockController extends HttpServlet {
 		int endPage; // 페이징바의 끝 수
 		int maxPage; // 가장 마지막 페이지
 		
+		String searchId = request.getParameter("searchId");
 		String filter = request.getParameter("sort-select");
+		
+		List<BlockMemberDTO> list = new ArrayList<>();
+		BlockService bs= new BlockService();
+		DeleteService ds = new DeleteService();
+		
+		listCount = bs.selectCombinedListCount(searchId, filter);
 		
 		currentPage = request.getParameter("cpage") == null ? 1 : Integer.parseInt(request.getParameter("cpage"));
 		
 		pageLimit = 10;
 		boardLimit = 10;
 		
-		List<BlockMemberDTO> list = new ArrayList<>();
-		BlockService bs= new BlockService();
-		
-	    if ("blocked".equals(filter)) {
-	        listCount = bs.selectBlockCount();
-	    } else if ("unblocked".equals(filter)) {
-	        listCount = bs.selectUnblockCount();
-	    } else {
-	        listCount = bs.selectListCount();
-	        filter = "all";
-	    }
-		
-
 		maxPage = (int) Math.ceil(listCount / (double)boardLimit);
 		startPage = (currentPage - 1) / pageLimit * pageLimit + 1;
 		endPage = startPage + pageLimit - 1;
@@ -74,18 +69,13 @@ public class MemberBlockController extends HttpServlet {
 		
 		PageInfo pi = new PageInfo(listCount, currentPage, pageLimit, boardLimit, startPage, endPage, maxPage);
 		
-
-		if("blocked".equals(filter)) {
-			list = bs.selectBlockList(pi);
-		} else if("unblocked".equals(filter)) {
-			list = bs.selectUnblockList(pi);
-		}else {
-			list = bs.selectAllList(pi);
-		}
+		list = bs.selectCombinedList(searchId, filter, pi);
+		
 				
 		request.setAttribute("list", list);
 		request.setAttribute("pi", pi);
 		request.setAttribute("filter", filter);
+		request.setAttribute("searchId", searchId);
 
 		request.getRequestDispatcher("/views/adminPage/admin/MemberBlock.jsp").forward(request, response);
 		

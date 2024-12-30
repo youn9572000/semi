@@ -5,6 +5,7 @@
 <%
 	List<Member> list = (List<Member>)request.getAttribute("list");
 	PageInfo pi = (PageInfo)request.getAttribute("pi");
+	String searchId = (String) request.getAttribute("searchId");
 	
 	int currentPage = pi.getCurrentPage();
 	int startPage = pi.getStartPage();
@@ -44,11 +45,116 @@
 				</script>
 			</header>
 
-			<form action="deleteMember" method="post">
+			<form action="<%= request.getContextPath() %>/admin/MemberDelete" method="get" id="searchFrom">
 				<div class="search-box">
-					<input type="text" name="search" placeholder="검색">
-					<button type="submit">조회</button>
+					<input type="text" id="search-id" name="searchId" placeholder="아이디 입력" value="<%= (searchId != null) ? searchId : "" %>">
+					
+					<input type="hidden" name="cpage" value="<%= pi.getCurrentPage() %>">
+					
+					<button type="button" class="serarch-btn" 
+					onclick="submitSearchForm()">조회</button>
 				</div>
+				</form>
+				
+				<div class="action-button">
+					<button type="button" class="delete-btn" onclick="showDeleteAlert()">회원삭제</button>
+				</div>
+				
+				<div class="custom-alert" id="customAlert">
+					<h2>회원 삭제 확인</h2>
+					<ul>
+						<li>선택하신 회원을 삭제하시겠습니까?</li>				
+					</ul>
+					<button id="confirmDelete">확인</button>
+					<button onclick="closeAlert()">취소</button>
+				</div>
+				<div class="overlay" id="overlay"></div>
+				
+				<script>
+					let selectedUsers = [];
+					
+					document.addEventListener('change', function(e){
+						if(e.target.name === 'deleteCheckbox') {
+							const row = e.target.closest('tr');
+							const rowData = {
+									userNo: row.children[0].textContent,
+									userId: row.children[1].textContent,
+									enrollDate: row.children[2].textContent,
+									rowElement: row
+							};
+							
+							if(e.target.checked){
+								selectedUsers.push(rowData);
+							} else {
+								selectedUsers = selectedUsers.filter(item => item.userNo !== rowData.userNo);
+				            }
+							console.log("현재 selectedUsers: ", selectedUsers);
+						}
+					});
+					
+					function showDeleteAlert(){
+						if(selectedUsers.length === 0){
+							alert("차단할 회원을 선택하세요.");
+							return;
+						}
+						
+						document.getElementById("customAlert").style.display = "block";
+				        document.getElementById("overlay").style.display = "block";
+						
+					}
+					
+					function closeAlert(){
+				    	document.getElementById("customAlert").style.display = "none";
+				    	document.getElementById("overlay").style.display = "none";						
+					}
+			
+				</script>
+				
+				<script>
+					document.addEventListener('DOMContentLoaded', function(){
+						const confirmDeleteBtn = document.getElementById('confirmDelete');
+						
+						if(confirmDeleteBtn){
+							confirmDeleteBtn.addEventListener('click', function(){
+								
+							   console.log("confirmBlock 버튼 클릭됨");
+					           console.log("선택된 회원 목록: ", selectedUsers);
+					           
+					           selectedUsers.forEach(user => {
+					        	   user.rowElement.children[1].textContent = user.userId
+					           });
+					           
+					           fetch('<%= request.getContextPath()%>/admin/DeleteUser', {
+					        	   method: 'POST',
+					        	   headers: {
+					        		   'Content-Type': 'application/json'
+					        	   },
+					        	   body: JSON.stringify(selectedUsers.map(user => ({
+					        		   
+					        			   userId: user.userId
+					        	   })))
+					           })
+					           .then(response => response.json())
+					           .then(data => {
+					        	   if(data.success){
+					        		   alert("회원 삭제 완료");
+					        		   location.reload();
+					        	   } else {
+					        		   alert("회원 삭제 실패");
+					        	   }
+					           })
+					           .catch(error => {
+					        	   console.error("서버 오류 발생: ", error);
+					        	   alert("서버에서 문제가 발생했습니다.");
+					           });
+					           
+					           closeAlert();
+					             
+							});
+						}
+					});
+				</script>
+				
 				<table>
 					<thead>
 						<tr>
@@ -56,29 +162,72 @@
 							<th>아이디</th>
 							<th>가입일</th>
 							<th>체크박스</th>
-							<th>회원삭제</th>
-							<th>기타</th>
 						</tr>
 					</thead>
-					<tbody>
-						<c:forEach var="member" items="${memberList}">
+					<tbody id="DeleteMemberTable">
+						<% for(Member m : list) { %>
 							<tr>
-								<td>${member.index}</td>
-								<td>${member.id}</td>
-								<td>${member.joinDate}</td>
+								<td><%= m.getUserNo() %></td>
+								<td><%= m.getUserId() %></td>
+								<td><%= m.getEnrollDate() %></td>
 								<td><input type="checkbox" name="deleteCheckbox"
-									value="${member.id}"></td>
-								<td><button type="button" class="delete-btn"
-										onclick="deleteMember('${member.id}')">회원삭제</button></td>
-								<td></td>
+									value="<%= m.getUserId()%>"></td>
+								
 							</tr>
-						</c:forEach>
+						<% } %>
 					</tbody>
 				</table>
+				
+								
+				<script>
+				    // 필터링 기능 - JavaScript로 클라이언트 측에서 필터링
+				    function submitSearchForm() {
+				        const searchId = document.getElementById('search-id').value.toLowerCase();
+				        const table = document.getElementById('DeleteMemberTable');
+				        const rows = table.getElementsByTagName('tr');
+				        const pagination = document.getElementsByClassName('pagination');
+				        const searchForm = document.getElementById('searchFrom');
+				        searchForm.submit();
+				        // 각 행을 확인하여 필터링 수행
+				        for (let i = 0; i < rows.length; i++) {
+				            const userId = rows[i].getElementsByTagName('td')[1].innerText.toLowerCase();
+				            if (userId.includes(searchId)) {
+				                rows[i].style.display = '';
+				            }else if(searchId === '') {
+				            	rows[i].style.display = '';
+				            } else {
+				                rows[i].style.display = 'none';
+				            }
+				        }
+				        
+  				        for (let i = 0; i < pagination.length; i++) {
+				        	pagination[i].style.display = searchId === '' ? '' : 'block';
+				        }  
+				    }
+				</script>
+				
+				
 				<div class="pagination">
-					<a href="#">&lt;</a> <a href="#">1</a> <a href="#">2</a> <a
-						href="#">3</a> <a href="#">&gt;</a>
+				    <% 
+				        String searchIdParam = (searchId != null && !searchId.isEmpty()) ? "&searchId=" + searchId : ""; 
+				    %>
+				
+				    <% if (pi.getCurrentPage() > 1) { %>
+				        <a href="<%= request.getContextPath() %>/admin/MemberDelete?cpage=1<%= searchIdParam %>">&lt;&lt;</a>
+				        <a href="<%= request.getContextPath() %>/admin/MemberDelete?cpage=<%= pi.getCurrentPage() - 1 %><%= searchIdParam %>">&lt;</a>
+				    <% } %>
+				
+				    <% for (int p = pi.getStartPage(); p <= pi.getEndPage(); p++) { %>
+				        <a href="<%= request.getContextPath() %>/admin/MemberDelete?cpage=<%= p %><%= searchIdParam %>"><%= p %></a>
+				    <% } %>
+				
+				    <% if (pi.getCurrentPage() < pi.getMaxPage()) { %>
+				        <a href="<%= request.getContextPath() %>/admin/MemberDelete?cpage=<%= pi.getCurrentPage() + 1 %><%= searchIdParam %>">&gt;</a>
+				        <a href="<%= request.getContextPath() %>/admin/MemberDelete?cpage=<%= pi.getMaxPage() %><%= searchIdParam %>">&gt;&gt;</a>
+				    <% } %>
 				</div>
+				
+				
 			</form>
 		</div>
 	</div>

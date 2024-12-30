@@ -1,6 +1,7 @@
 package com.kh.admin.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -10,48 +11,67 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.kh.admin.model.service.AdminDeleteService;
+import com.kh.admin.model.service.BlockService;
+import com.kh.admin.model.service.DeleteService;
 import com.kh.admin.model.vo.Member;
 import com.kh.common.model.vo.PageInfo;
 
 /**
  * Servlet implementation class MemberDeleteController
  */
-@WebServlet("/MemberDeleteController")
+@WebServlet("/admin/MemberDelete")
 public class MemberDeleteController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private AdminDeleteService adminDeleteService = new AdminDeleteService(); // 인스턴스 생성
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	int currentPage = 1; // 기본 페이지
-        int pageLimit = 10; // 페이징바에 표시할 최대 개수
-        int boardLimit = 10; // 한 페이지당 보여질 게시글의 최대 개수
+    	// 페이징 처리에 필요한 변수
+    	int listCount = 0; // 게시글 총 개수
+    	int currentPage; // 요청한 페이지
+    	int pageLimit; // 페이징바에 표시할 최대 갯수
+    	int boardLimit; // 한 페이지당 보여질 게시글의 최대 갯수.
+    			
+    	int startPage; // 페이징바의 시작 수
+    	int endPage; // 페이징바의 끝 수
+    	int maxPage; // 가장 마지막 페이지
+    	String searchId = request.getParameter("searchId");
 
-        // 현재 페이지 번호 처리
-        if (request.getParameter("currentPage") != null) {
-            currentPage = Integer.parseInt(request.getParameter("currentPage"));
-        }
+    	List<Member> list = new ArrayList<>();
+    	BlockService bs = new BlockService();
+    	DeleteService ds = new DeleteService();
+    	
+    	
+    	if (searchId == null || searchId.isEmpty()) {
+    		listCount = bs.selectListCount();
+    	} else {
+    		listCount = ds.selectListCount(searchId);
+    	}
+    	
+		currentPage = request.getParameter("cpage") == null ? 1 : Integer.parseInt(request.getParameter("cpage"));
+		
+		pageLimit = 10;
+		boardLimit = 10;
 
-        // 전체 회원 수 조회
-        int listCount = adminDeleteService.getMemberCount();
-
-        // 페이징 계산
-        int maxPage = (int) Math.ceil((double) listCount / boardLimit);
-        int startPage = ((currentPage - 1) / pageLimit) * pageLimit + 1;
-        int endPage = startPage + pageLimit - 1;
-        if (endPage > maxPage) endPage = maxPage;
-
-        // PageInfo 객체 생성
-        PageInfo pi = new PageInfo(listCount, currentPage, pageLimit, boardLimit, startPage, endPage, maxPage);
-
-
-        // 회원 목록 조회
-        int startRow = (currentPage - 1) * boardLimit + 1;
-        int endRow = currentPage * boardLimit;
-        List<Member> memberList = adminDeleteService.getMemberList(startRow, endRow);
+		maxPage = (int) Math.ceil(listCount / (double)boardLimit);
+		startPage = (currentPage - 1) / pageLimit * pageLimit + 1;
+		endPage = startPage + pageLimit - 1;
+		
+		if(endPage > maxPage) {
+			endPage = maxPage;
+		}
+			    
+		PageInfo pi = new PageInfo(listCount, currentPage, pageLimit, boardLimit, startPage, endPage, maxPage);
+		
+		if (searchId == null || searchId.isEmpty()) {
+			list = ds.selectAllList(pi);
+	    } else {
+	        list = ds.searchIdList(searchId, pi);
+	    }
 
         // 데이터 설정
         request.setAttribute("pi", pi);
-        request.setAttribute("memberList", memberList);
+        request.setAttribute("list", list);
+        request.setAttribute("searchId", searchId);
 
         // JSP로 포워딩
         

@@ -123,30 +123,41 @@ public class BlockDao {
 	
 
 
-	public String selectSearchId(String searchId, Connection conn) {
-		String result = null;
+	public List<BlockMemberDTO> selectSearchId(String searchId, Connection conn, PageInfo pi) {
+		List<BlockMemberDTO> list = new ArrayList<>();
 		PreparedStatement pstmt = null;
-		String sql = prop.getProperty("searchId");
+		String sql = prop.getProperty("blockSearchIdList");
 		ResultSet rset = null;
 		
 		try {
 			pstmt = conn.prepareStatement(sql);
+			
+			int startRow = (pi.getCurrentPage() - 1) * pi.getBoardLimit() + 1;
+			int endRow = startRow + pi.getBoardLimit() - 1;
+			
 			pstmt.setString(1, searchId);
+			pstmt.setInt(2, startRow);
+			pstmt.setInt(3, endRow);
 			
 			rset = pstmt.executeQuery();
 			
-	        if (rset.next()) {
-	            result = rset.getString(1);
-	        }
-			
+			while(rset.next()) {
+				Block b = Block.builder()
+						.reason(rset.getString("BLOCK_REASON"))
+						.blockDay(rset.getInt("BLOCK_DAY"))
+						.blockDate(rset.getDate("BLOCK_DATE"))
+						.build();
+				Member m = Member.builder()
+						.userNo(rset.getInt("USER_NO"))
+						.userId(rset.getString("USER_ID"))
+						.build();
+				list.add(new BlockMemberDTO(b, m));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
-			close(rset);
-			close(pstmt);
 		}
 		
-		return result;
+		return list;
 		
 	}
 
@@ -319,7 +330,105 @@ public class BlockDao {
 		
 	}
 
+	public int selectCombinedListCount(Connection conn, String searchId, String filter) {
+		int count = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		String query = "SELECT COUNT(*) FROM MEMBER WHERE 1=1";
+		
+        if (searchId != null && !searchId.isEmpty()) {
+            query += " AND USER_ID LIKE ?";
+        }
+        
+        if ("blocked".equals(filter)) {
+            query += " AND BLOCK_NO IS NOT NULL";
+        } else if ("unblocked".equals(filter)) {
+            query += " AND BLOCK_NO IS NULL";
+        }
+		
+		try {
+			pstmt = conn.prepareStatement(query);
+			int paramIndex = 1;
+			
+			if(searchId != null && !searchId.isEmpty()) {
+				pstmt.setString(paramIndex++, "%" + searchId + "%");
+			}
+			
+			rset = pstmt.executeQuery();
+			if(rset.next()) {
+				count = rset.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			close(rset);
+			close(pstmt);
+		}
+		
+		return count;
+	}
 
+	public List<BlockMemberDTO> selectCombinedList(Connection conn, String searchId, String filter, PageInfo pi) {
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		List<BlockMemberDTO> list = new ArrayList<>();
+		
+		String query = "SELECT * FROM (" +
+				" SELECT M.USER_ID, M.USER_NO, B.BLOCK_REASON, B.BLOCK_DAY, B.BLOCK_DATE, ROW_NUMBER() OVER (ORDER BY M.USER_NO) AS RNUM " +
+                "FROM MEMBER M " +
+                "LEFT JOIN BLOCK B ON M.BLOCK_NO = B.BLOCK_NO " +
+                "WHERE 1=1";
+		
+		if(searchId != null && !searchId.isEmpty()) {
+			query += " AND M.USER_ID LIKE ?";
+		}
+		if("blocked".equals(filter)) {
+			query += " AND B.BLOCK_NO IS NOT NULL";
+		}else if("unblocked".equals(filter)) {
+            query += " AND B.BLOCK_NO IS NULL";
+        }
+		
+		query += ") WHERE RNUM BETWEEN ? AND ?";
+		
+		try {
+			pstmt = conn.prepareStatement(query);
+			int paramIndex = 1;
+			
+			if(searchId != null && !searchId.isEmpty()) {
+				pstmt.setString(paramIndex++, "%" + searchId + "%");
+			}
+			pstmt.setInt(paramIndex++, (pi.getCurrentPage() - 1) * pi.getBoardLimit());
+			pstmt.setInt(paramIndex, pi.getBoardLimit());
+			
+			rset = pstmt.executeQuery();
+
+			while(rset.next()) {
+				Block b = Block.builder()
+						.reason(rset.getString("BLOCK_REASON"))
+						.blockDay(rset.getInt("BLOCK_DAY"))
+						.blockDate(rset.getDate("BLOCK_DATE"))
+						.build();
+				Member m = Member.builder()
+						.userNo(rset.getInt("USER_NO"))
+						.userId(rset.getString("USER_ID"))
+						.build();
+				list.add(new BlockMemberDTO(b, m));
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			close(rset);
+			close(pstmt);
+		}
+		
+		return list;
+		
+	}
+	
+	
+	
+	
 
 }
 
