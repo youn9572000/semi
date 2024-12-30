@@ -279,11 +279,20 @@
 		WHERE USER_ID = ?
 	</entry>
 	
-	<entry key="searchId">
-		SELECT USER_NO, M.USER_ID, BLOCK_REASON, BLOCK_DAY, BLOCK_DATE
-		FROM MEMBER M
-		LEFT JOIN BLOCK B USING(BLOCK_NO)
-		WHERE M.USER_ID = ?
+	<entry key="blockSearchIdList">
+		SELECT *
+		FROM (
+		    SELECT ROWNUM RNUM, A.*
+		    FROM (
+		        SELECT
+		            USER_NO, m.USER_ID, BLOCK_REASON, BLOCK_DAY, BLOCK_DATE
+		        FROM MEMBER m
+		        LEFT JOIN BLOCK USING(BLOCK_NO)
+		        WHERE USER_ID LIKE '%' || ? || '%'
+		        ORDER BY USER_NO
+		    ) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
 	</entry>
 	
 	<entry key="selectBlockList">
@@ -345,7 +354,7 @@
 	</entry>
    
 
-      <entry key="searchBaord">
+   <entry key="searchBaord">
   SELECT * FROM (
             SELECT ROWNUM AS RN, T.* 
             FROM (
@@ -380,6 +389,43 @@
    <entry key="deleteMemberCount">
  	 SELECT COUNT(*)
     FROM MEMBER
+   </entry>
+   
+   <entry key="selectSearchlistCount">
+    SELECT COUNT(*)
+    FROM MEMBER
+    WHERE USER_ID LIKE '%' || ? || '%'  
+   </entry>
+   
+   <entry key="searchIdList">
+   		SELECT *
+		FROM (
+		    SELECT ROWNUM RNUM, A.*
+		    FROM (
+		        SELECT *
+		        FROM MEMBER 
+		        WHERE USER_ID LIKE '%' || ? || '%'
+		        ORDER BY USER_NO
+		    ) A
+		)
+		WHERE RNUM BETWEEN ? AND ? 
+   </entry>
+   
+   <entry key="deleteUsers">
+	   DELETE FROM MEMBER
+	   WHERE USER_ID = ?
+   </entry>
+   <entry key="deleteAllList">
+	   SELECT *
+		FROM (
+		    SELECT ROWNUM RNUM, A.*
+		    FROM (
+		        SELECT * 
+		        FROM MEMBER
+		        ORDER BY USER_NO
+		    ) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
    </entry>
 
 

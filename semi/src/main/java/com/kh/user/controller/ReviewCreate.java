@@ -1,7 +1,6 @@
 package com.kh.user.controller;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -10,72 +9,59 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.kh.user.model.service.ReviewService;
-import com.kh.user.model.vo.Member;
 import com.kh.user.model.vo.Review;
-
-
+import com.kh.user.model.vo.Member;
 
 @WebServlet("/review/create")
 public class ReviewCreate extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
+    private static final long serialVersionUID = 1L;
+
     public ReviewCreate() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		request.getRequestDispatcher("/views/product/product.jsp").forward(request, response);
-	}
+    // POST : 리뷰 작성 처리
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    int productNo = Integer.parseInt(request.getParameter("productNo")); // 상품 번호
-	    String reviewWriter = request.getParameter("reviewWriter");         // 리뷰 작성자 (userId)
-	    String reviewContent = request.getParameter("reviewContent");       // 리뷰 내용
-	    int reviewScore = Integer.parseInt(request.getParameter("reviewScore")); // 리뷰 별점
+        request.setCharacterEncoding("UTF-8");
 
-	    HttpSession session = request.getSession();
-	    Member loginUser = (Member) session.getAttribute("loginUser");
-	    int userNo = loginUser.getUserNo(); // 로그인한 사용자의 회원 번호
+        // 1) 로그인된 유저 확인
+        HttpSession session = request.getSession();
+        Member loginUser = (Member) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            session.setAttribute("alertMsg", "로그인 후 이용해주세요.");
+            response.sendRedirect(request.getContextPath() + "/member/login");
+            return;
+        }
 
-	    // 작성자 검증
-	    if (!reviewWriter.equals(loginUser.getUserId())) {
-	        request.setAttribute("errorMsg", "잘못된 접근입니다.");
-	        request.getRequestDispatcher("/views/common/errorPage.jsp").forward(request, response);
-	        return;
-	    }
+        // 2) 파라미터 추출
+        int productNo = Integer.parseInt(request.getParameter("productNo"));
+        String reviewContent = request.getParameter("reviewContent");
+        int reviewScore = Integer.parseInt(request.getParameter("reviewScore"));
 
-	    // Review 객체 생성
-	    Review r = Review.builder()
-	            .productNo(productNo)
-	            .reviewWriter(reviewWriter)
-	            .reviewContent(reviewContent)
-	            .reviewScore(reviewScore)
-	            .build();
+        // 3) 리뷰 객체 생성 및 기본값 설정
+        Review review = Review.builder()
+                .reviewWriter(loginUser.getUserNo()) // 로그인된 사용자 ID
+                .productNo(productNo) // 상품 번호
+                .reviewContent(reviewContent) // 리뷰 내용
+                .reviewScore(reviewScore) // 별점
+                .reviewStatus('N') // 기본값: 정상 상태
+                .build();
 
-	    // 리뷰 등록 처리
-	    int result = new ReviewService().insertReview(r);
+        // 4) 서비스 호출
+        ReviewService reviewService = new ReviewService();
+        int result = reviewService.insertReview(review);
 
-	    if (result > 0) {
-	        // 등록 성공: 리뷰 목록 페이지로 이동
-	        response.sendRedirect(request.getContextPath() + "/review/list?productNo=" + productNo);
-	    } else {
-	        // 등록 실패: 리뷰 작성 페이지로 이동
-	        request.setAttribute("errorMsg", "리뷰 등록에 실패했습니다.");
-	        request.setAttribute("productNo", productNo); // 상품 번호 유지
-	        request.setAttribute("reviewContent", reviewContent); // 입력한 리뷰 내용 유지
-	        request.setAttribute("reviewScore", reviewScore); // 입력한 별점 유지
-	        request.getRequestDispatcher("/views/product/product.jsp").forward(request, response);
-	    }
-	}
+        // 5) 결과 처리
+        if (result > 0) {
+            session.setAttribute("alertMsg", "리뷰가 성공적으로 등록되었습니다.");
+        } else {
+            session.setAttribute("alertMsg", "리뷰 등록에 실패했습니다.");
+        }
+
+        // 상품 상세 페이지로 리다이렉트
+        response.sendRedirect(request.getContextPath() + "/product/detail?pno=" + productNo);
+    }
 }

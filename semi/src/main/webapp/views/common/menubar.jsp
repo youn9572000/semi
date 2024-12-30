@@ -61,9 +61,9 @@
 
             <!-- 네비게이션 메뉴 -->
             <ul class="gnb">
-                <li><a href="<%= request.getContextPath() %>/views/product/gs.jsp">GS25</a></li>
-                <li><a href="<%= request.getContextPath() %>/views/product/cu.jsp">CU</a></li>
-                <li><a href="<%= request.getContextPath() %>/views/product/seven.jsp">7-ELEVEN</a></li>
+                <li><a href="<%= request.getContextPath() %>/views/store/gs.jsp">GS25</a></li>
+                <li><a href="<%= request.getContextPath() %>/views/store/cu.jsp">CU</a></li>
+                <li><a href="<%= request.getContextPath() %>/views/store/seven.jsp">7-ELEVEN</a></li>
                 <li class="menu-item" data-menu="게시판"><a>게시판</a></li>
 				<li class="menu-item" data-menu="고객센터"><a>고객센터</a></li>
             </ul>

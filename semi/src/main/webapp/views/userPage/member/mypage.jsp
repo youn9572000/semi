@@ -30,7 +30,7 @@
 					<li><a href="#" class="active">회원정보</a></li>
 					<li><a href="#">등록한 게시글</a></li>
 					<li><a href="#">등록한 댓글</a></li>
-					<li><a href="#">찜 목록</a></li>
+					<li><a href="${pageContext.request.contextPath}/views/userPage/member/savelist.jsp">찜 목록</a></li>
 				</ul>
 			</nav>
 

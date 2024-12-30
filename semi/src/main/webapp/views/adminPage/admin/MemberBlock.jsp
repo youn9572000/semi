@@ -7,6 +7,7 @@
 	PageInfo pi = (PageInfo) request.getAttribute("pi");
 	String filter = (String) request.getAttribute("filter");
 	String result = (String) request.getAttribute("result");
+	String searchId = (String) request.getAttribute("searchId");
 	
 	int currentPage = pi.getCurrentPage();
 	int startPage = pi.getStartPage();
@@ -16,7 +17,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <meta charset="UTF-8">
 <title>회원차단 페이지</title>
 
@@ -52,38 +52,20 @@
 
 			<!-- 검색 및 정렬 영역 -->
 			<div class="controls">
-				<form action="<%= request.getContextPath() %>/admin/SearchUser"
-					method="get" id="searchForm">
+				<form action="<%= request.getContextPath() %>/admin/MemberBlock"
+					method="get" id="searchFrom">
 					<div class="search-box">
 					
-						<input type="text" id="search-id" name="searchId" placeholder="아이디 입력"> 
-						<%-- <input type="hidden" name="filter" id="filterInput" value="<%= filter != null ? filter : "all" %>"> --%>
+						<input type="text" id="search-id" name="searchId" placeholder="아이디 입력" value="<%= (searchId != null) ? searchId : "" %>"> 
+						<input type="hidden" name="sort-select" value="<%= (filter != null) ? filter : "all" %>">
 						
 						
-						<input type="hidden" name="cpage"
-							value="<%= pi.getCurrentPage() %>">
+						<input type="hidden" name="cpage" value="<%= pi.getCurrentPage() %>">
 
 						<button type="button" class="search-btn"
 							onclick="submitSearchForm()">조회</button>
 					</div>
 				</form>
-
-<!-- 				<script>
-				    // 검색 폼 제출 전 처리 (검색어가 비어 있으면 searchId 제거)
-				    function submitSearchForm() {
-				        const searchInput = document.getElementById('search-id');
-				        const filterInput = document.getElementById('filterInput');
-				        const form = document.getElementById('searchForm');
-				        console.log("fliter: " + filter);
-				        console.log("Search Input Value:", searchInput.value);
-				        
-				        // 검색어가 비어 있을 경우 searchId 파라미터 제거
-				        if (searchInput.value.trim() === "") {
-				        	filterInput.value = "all"
-				        }
-				        form.submit();
-				    }
-				</script> -->
 
 				<!-- 회원 필터링 셀렉트박스 기능 -->
 				<form action="<%= request.getContextPath() %>/admin/MemberBlock"
@@ -91,23 +73,32 @@
 					<div class="sort-box">
 						<select id="sort-select" name="sort-select" placeholder="정렬기준"
 							onchange="submitFilterForm()">
-							<option value="all" <%= "all".equals(filter) ? "selected" : "" %>>전체회원</option>
+							<option value="all" <%= (filter == null || "all".equals(filter)) ? "selected" : "" %>>전체회원</option>
 							<option value="blocked"
 								<%= "blocked".equals(filter) ? "selected" : "" %>>차단회원</option>
 							<option value="unblocked"
 								<%= "unblocked".equals(filter) ? "selected" : "" %>>차단안된회원</option>
-						</select> <%-- <input type="hidden" name="searchId"
-							value="<%= request.getParameter("searchId") != null ? request.getParameter("searchId") : "" %>"> --%>
-						<input type="hidden" name="cpage"
-							value="<%= pi.getCurrentPage() %>">
-						<%-- <input type="hidden" name="cpage" value="<%= currentPage %>"> --%>
+						</select>  
+						<input type="hidden" name="searchId" value="<%= (searchId != null) ? searchId : "" %>">
+						<input type="hidden" name="cpage" value="<%= pi.getCurrentPage() %>">
 					</div>
 				</form>
 
 
 				<script>
 				    function submitFilterForm() {
-				        document.getElementById('filterForm').submit();
+				    	const searchId = document.getElementById('search-id').value;
+				        const filterForm = document.getElementById('filterForm').submit();
+				        
+				        if (searchId) {
+				            const hiddenSearch = document.createElement("input");
+				            hiddenSearch.setAttribute("type", "hidden");
+				            hiddenSearch.setAttribute("name", "searchId");
+				            hiddenSearch.setAttribute("value", searchId);
+				            filterForm.appendChild(hiddenSearch);
+				        }
+				        
+				        filterForm.submit();
 				    }
 				</script>
 				
@@ -358,7 +349,6 @@
 				</thead>
 				<tbody id="blockMemberTable">
 					<% 
-							    String searchId = request.getParameter("result");
 								for(BlockMemberDTO b : list) { 
 									 if (searchId == null || searchId.isEmpty() || b.getMember().getUserId().contains(searchId)) {
 							%>
@@ -414,41 +404,15 @@
 				</script>
 
 
-
-
 			<script>
 				    // 필터링 기능 - JavaScript로 클라이언트 측에서 필터링
 				    function submitSearchForm() {
 				        const searchId = document.getElementById('search-id').value.toLowerCase();
-				        const table = document.getElementById('blockMemberTable');
-				        const rows = table.getElementsByTagName('tr');
-				        const pagination = document.getElementsByClassName('pagination');
-				        let filtered = false;
-				
-				        // 각 행을 확인하여 필터링 수행
-				        for (let i = 0; i < rows.length; i++) {
-				            const userId = rows[i].getElementsByTagName('td')[1].innerText.toLowerCase();
-				            if (userId.includes(searchId)) {
-				                rows[i].style.display = '';
-				                filtered = true;
-				            }else if(searchId === '') {
-				            	rows[i].style.display = '';
-				            } else {
-				                rows[i].style.display = 'none';
-				            }
-				        }
-				        
-				        for (let i = 0; i < pagination.length; i++) {
-				        	pagination[i].style.display = searchId === '' ? '' : (filtered ? 'none' : '');
-				        }
+				        const searchForm = document.getElementById('searchFrom');
+				        searchForm.submit();
 				    }
 				</script>
 
-
-
-
-
-			
 
 
 			<!-- 전체 선택/해제 기능 -->
@@ -470,33 +434,43 @@
         	</script>
 
 			<div align="center" class="pagination">
-				<% if (pi.getCurrentPage() > 1) { %>
-				<!-- 처음 페이지로 이동 -->
-				<a
-					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=1&sort-select=<%= filter != null ? filter : "all" %>">&lt;&lt;</a>
-				<a
-					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getCurrentPage() - 1 %>&sort-select=<%= filter != null ? filter : "all" %>">&lt;</a>
-				<% } %>
-
-				<% for (int p = pi.getStartPage(); p <= pi.getEndPage(); p++) { %>
-				<a
-					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= p %>&sort-select=<%= filter != null ? filter : "all" %>"
-					class="<%= (pi.getCurrentPage() == p) ? "active" : "" %>"> <%= p %>
-				</a>
-				<% } %>
-
-				<% if (pi.getCurrentPage() < pi.getMaxPage()) { %>
-				<a
-					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getCurrentPage() + 1 %>&sort-select=<%= filter != null ? filter : "all" %>">&gt;</a>
-				<a
-					href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getMaxPage() %>&sort-select=<%= filter != null ? filter : "all" %>">&gt;&gt;</a>
-				<% } %>
+			    <% 
+			    String searchIdParam = (searchId != null && !searchId.isEmpty()) ? "&searchId=" + searchId : ""; 
+			    String sortSelectParam = (filter != null && !filter.isEmpty()) ? "&sort-select=" + filter : "";
+			    %>
+			    
+			    <% if (pi.getCurrentPage() > 1) { %>
+			    <!-- 처음 페이지로 이동 -->
+			    <a href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=1<%= sortSelectParam %><%= searchIdParam %>">&lt;&lt;</a>
+			    <a href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getCurrentPage() - 1 %><%= sortSelectParam %><%= searchIdParam %>">&lt;</a>
+			    <% } %>
+			
+			    <% for (int p = pi.getStartPage(); p <= pi.getEndPage(); p++) { %>
+			    <a href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= p %><%= sortSelectParam %><%= searchIdParam %>"
+			       class="<%= (pi.getCurrentPage() == p) ? "active" : "" %>"> <%= p %>
+			    </a>
+			    <% } %>
+			
+			    <% if (pi.getCurrentPage() < pi.getMaxPage()) { %>
+			    <a href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getCurrentPage() + 1 %><%= sortSelectParam %><%= searchIdParam %>">&gt;</a>
+			    <a href="<%= request.getContextPath() %>/admin/MemberBlock?cpage=<%= pi.getMaxPage() %><%= sortSelectParam %><%= searchIdParam %>">&gt;&gt;</a>
+			    <% } %>
 			</div>
 
 			<script>
 			    function movePage(cpage){
 			        const sortValue = document.getElementById('sort-select').value;
-			        location.assign('<%= request.getContextPath() %>/admin/MemberBlock?cpage=' + cpage + '&sort-select=' + sortValue);
+			        const searchId = document.getElementById('search-id') ? document.getElementById('search-id').value : "";
+			        
+			        let url = '<%= request.getContextPath() %>/admin/MemberBlock?cpage=' + cpage + '&sort-select=' + sortValue;
+			        
+			        // 검색어가 있는 경우 URL에 추가
+			        if (searchId) {
+			            url += '&searchId=' + searchId;
+			        }
+			        
+			        location.assign(url);			    
+			    
 			    };
 			</script>
 		</div>

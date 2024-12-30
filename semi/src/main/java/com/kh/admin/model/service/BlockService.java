@@ -58,20 +58,15 @@ public class BlockService {
         return result;
 	}
 
-	public String selectSearchId(String searchId) {
+	public List<BlockMemberDTO> selectSearchId(String searchId, PageInfo pi) {
 		
 		Connection conn = getConnection();
-		String result = null;
 		
-		if(searchId == null || searchId.trim().isEmpty()) {
-			  result = dao.searchAllList(conn);
-		} else {
-			 result = dao.selectSearchId(searchId, conn); 			
-		}
-	
+		List<BlockMemberDTO> list = dao.selectSearchId(searchId, conn, pi);
+		
 		close(conn);
 		
-		return result;
+		return list;
 	}
 
 	public List<BlockMemberDTO> selectBlockList(PageInfo pi) {
@@ -134,8 +129,26 @@ public class BlockService {
 	
 	}
 
+	public int selectCombinedListCount(String searchId, String filter) {
+		Connection conn = getConnection();
+		
+		int result = dao.selectCombinedListCount(conn, searchId, filter);
+		
+		close(conn);
+		
+		return result;
+		
+	}
 
-
-	
+	public List<BlockMemberDTO> selectCombinedList(String searchId, String filter, PageInfo pi) {
+		Connection conn = getConnection();
+		
+		
+		List<BlockMemberDTO> list = dao.selectCombinedList(conn, searchId, filter, pi);
+		
+		close(conn);
+		
+		return list;
+	}
 
 }
