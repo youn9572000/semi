@@ -53,6 +53,21 @@ String contextPath = request.getContextPath();
             });
         });
     </script>
+   <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '<%= request.getContextPath() %>/visitor?action=increment',
+                method: 'GET',
+                success: function (response) {
+                    console.log("방문자 수 증가 성공: ", response);
+                },
+                error: function (xhr, status, error) {
+                    console.log("방문자 수 증가 실패: 상태코드 " + xhr.status + ", 메시지: " + error);
+                }
+            });
+        });
+    </script>
+
 </head>
 <body>    
 <!-- header -->
@@ -317,12 +332,10 @@ String contextPath = request.getContextPath();
                     submenu.appendChild(li);
                 });
 
-
                 // 대메뉴 아래에 소메뉴 추가
                 menuItem.appendChild(submenu);
             }
         });
     </script>
-
 </body>
 </html>

@@ -3,6 +3,7 @@
 
 <properties>
 <entry key="selectFList">
+    <![CDATA[
     SELECT *
     FROM (
         SELECT ROWNUM AS RNUM, A.*
@@ -19,8 +20,9 @@
             ORDER BY CREATE_DATE DESC
         ) A )
         WHERE RNUM BETWEEN ? AND ?
-    
+    ]]>
 </entry>
+
 		<entry key="selectEList">
 		    SELECT *
 		    FROM (
@@ -373,19 +375,7 @@
         WHERE BOARD_CATEGORY = ? 
         AND (BOARD_TITLE LIKE ? OR BOARD_CONTENT LIKE ? OR BOARD_WRITER LIKE ?)
    </entry>
-   <entry key="mboardDelete">
-   SELECT *
-    FROM (
-        SELECT ROWNUM AS RNUM, A.*
-        FROM (
-            SELECT USER_NO, USER_ID, ENROLL_DATE, STATUS
-            FROM MEMBER
-            WHERE STATUS = 'ACTIVE'
-            ORDER BY ENROLL_DATE DESC
-        ) A
-    )
-    WHERE RNUM BETWEEN ? AND ?
-   </entry>
+
    <entry key="deleteMemberCount">
  	 SELECT COUNT(*)
     FROM MEMBER
@@ -427,7 +417,20 @@
 		)
 		WHERE RNUM BETWEEN ? AND ?
    </entry>
+	
 
+	<entry key="incrementVisitorCount">
+    
+        MERGE INTO VISITER v
+        USING (SELECT ? AS visit_date FROM dual) d
+        ON (v.visit_date = d.visit_date)
+        WHEN MATCHED THEN
+            UPDATE SET visit_count = visit_count + 1
+        WHEN NOT MATCHED THEN
+            INSERT (visit_date, visit_count) VALUES (?, 1)
+  
+</entry>
+	
 
 </properties>
 

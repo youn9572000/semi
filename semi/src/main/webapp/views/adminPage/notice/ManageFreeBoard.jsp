@@ -99,30 +99,34 @@ int maxPage = pi.getMaxPage();
 			</form>
 
 			<!-- 페이징 네비게이션 -->
-            <div class="pagination">
-                <c:if test="${pi.startPage > 1}">
-                    <a
-                        href="${pageContext.request.contextPath}/admin/search?type=free&keyword=${param.keyword}&page=${pi.startPage - 1}"
-                        class="prev">이전</a>
-                </c:if>
-                <c:forEach var="i" begin="${pi.startPage}" end="${pi.endPage}">
-                    <a
-                        href="${pageContext.request.contextPath}/admin/search?type=free&keyword=${param.keyword}&page=${i}"
-                        class="${i == pi.currentPage ? 'active' : ''}"> ${i} </a>
-                </c:forEach>
-                <c:if test="${pi.endPage < pi.maxPage}">
-                    <a
-                        href="${pageContext.request.contextPath}/admin/search?type=free&keyword=${param.keyword}&page=${pi.endPage + 1}"
-                        class="next">다음</a>
-                </c:if>
-            </div>
- 
-        <script>
-            
+            <!-- 페이지네이션 -->
+			<div align="center" class="pagination">
+				<% if (currentPage > 1) { %>
+				<!-- 이전 페이지 이동 -->
+				<a href="<%= request.getContextPath() %>/admin/flist?cpage=1">&lt;&lt;</a>
+				<a
+					href="<%= request.getContextPath() %>/admin/flist?cpage=<%= currentPage - 1 %>">&lt;</a>
+				<% } %>
+
+				<% for (int p = startPage; p <= endPage; p++) { %>
+				<a href="<%= request.getContextPath() %>/admin/flist?cpage=<%= p %>"
+					class="<%= (currentPage == p) ? "active" : "" %>"> <%= p %>
+				</a>
+				<% } %>
+
+				<% if (currentPage < maxPage) { %>
+				<!-- 다음 페이지 이동 -->
+				<a
+					href="<%= request.getContextPath() %>/admin/flist?cpage=<%= currentPage + 1 %>">&gt;</a>
+				<a
+					href="<%= request.getContextPath() %>/admin/flist?cpage=<%= maxPage %>">&gt;&gt;</a>
+				<% } %>
+			</div>
+
+			<script>
         	function movePage(cpage){
-                location.assign('<%=contextPath%>/admin/flist/list?cpage='+cpage);
+        		location.assign('<%= contextPath %>/admin/flist/list?cpage='+cpage);
         	}
-        </script>
 	<script>
     function toggleAllCheckboxes(source) {
         const checkboxes = document.querySelectorAll('input[name="boardNo"]');

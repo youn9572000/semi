@@ -26,12 +26,22 @@ PageInfo reviewPi = (PageInfo) request.getAttribute("reviewPi");
 			<!-- 사이드바 -->
 	
 	        <%@ include file="/views/common/AdminSidebar.jsp" %>
-	  
-	
-			<!-- 메인 콘텐츠 -->
-		<div class="main-content">
-			<h1>신고 관리</h1>
 
+
+		<!-- 메인 콘텐츠 -->
+		<div class="main-content">
+			<div class="header-container">
+				<h1>신고 관리</h1>
+				<div class="admin-icons">
+					<a href="#" class="tooltip" id="logout-btn"> <img
+						src="<%=contextPath%>/resources/logout이미지.png" alt="로그아웃">
+					</a> <a href="<%=contextPath%>/views/adminPage/admin/MainPage.jsp"
+						class="tooltip" id="home-btn"> <img
+						src="<%=contextPath%>/resources/mainPage이동.png" alt="메인페이지 이동">
+					</a>
+				</div>
+			</div>
+			</header>
 			<!-- 게시글 신고 목록 -->
 			<div class="report-card">
 				<h2>게시글 신고 목록</h2>
@@ -79,22 +89,22 @@ PageInfo reviewPi = (PageInfo) request.getAttribute("reviewPi");
 						%>
 					</tbody>
 				</table>
-			<!-- 페이징 처리 -->
-			<!-- 게시글 페이징 -->
-			<div class="pagination">
-				<%
+				<!-- 페이징 처리 -->
+				<!-- 게시글 페이징 -->
+				<div class="pagination">
+					<%
 				for (int boardPage = boardPi.getStartPage(); boardPage <= boardPi.getEndPage(); boardPage++) {
 				%>
-				<a
-					href="?boardPage=<%=boardPage%>&replyPage=<%=replyPi.getCurrentPage()%>&reviewPage=<%=reviewPi.getCurrentPage()%>"
-					class="<%=boardPi.getCurrentPage() == boardPage ? "on" : ""%>">
-					<%=boardPage%>
-				</a>
-				<%
+					<a
+						href="?boardPage=<%=boardPage%>&replyPage=<%=replyPi.getCurrentPage()%>&reviewPage=<%=reviewPi.getCurrentPage()%>"
+						class="<%=boardPi.getCurrentPage() == boardPage ? "on" : ""%>">
+						<%=boardPage%>
+					</a>
+					<%
 				}
 				%>
-			</div>
-			</table>
+				</div>
+				</table>
 			</div>
 
 
@@ -108,12 +118,13 @@ PageInfo reviewPi = (PageInfo) request.getAttribute("reviewPi");
 					<%
 					for (Reply reply : replyList) {
 					%>
-					<li><input type="checkbox" name="replyIds"
-						value="<%=reply.getReplyNo()%>">
+					<li>
+
 						<div class="content">
 							<%=reply.getReplyContent()%>
 						</div>
 						<div class="date">
+							게시글 제목:
 							<%=reply.getRboardTitle()%>
 							<%=reply.getCreateDate()%>
 						</div>
@@ -166,8 +177,8 @@ PageInfo reviewPi = (PageInfo) request.getAttribute("reviewPi");
 					<%
 					for (Review review : reviewList) {
 					%>
-					<li><input type="checkbox" name="reviewIds"
-						value="<%=review.getReviewNo()%>">
+					<li>
+
 						<div class="content">
 							<%=review.getReviewContent()%>
 						</div>

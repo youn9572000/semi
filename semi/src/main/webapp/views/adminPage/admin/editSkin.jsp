@@ -1,63 +1,67 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>스킨 편집</title>
+    <title>관리자 페이지</title>
+    <!-- 메인 콘텐츠 CSS 연결 -->
     <link rel="stylesheet" type="text/css"
-	href="${pageContext.request.contextPath}/resources/css/adminCss/skin.css">
-    <style>
-        /* 추가 CSS */
-        .main-content {
-            overflow-y: auto;
-            height: calc(100vh - 40px); /* 헤더 제외한 전체 높이 */
-            padding: 20px;
-            background-color: #fff;
-        }
-    </style>
+     href="${pageContext.request.contextPath}/resources/css/adminCss/skin.css">
 </head>
 <body>
-    <div class="container">
-        <!-- 사이드바 -->
-     <%@ include file="/views/common/AdminSidebar.jsp" %>
-      
-        <!-- 메인 컨텐츠 -->
-        <main class="main-content">
-            <!-- 1번 섹션 -->
-            <div class="section">
-                <h2>1) 스킨 편집</h2>
-                <form>
-                    <label for="logo">로고 (180px)</label>
-                    <input type="text" id="logo" placeholder="로고(넓이 180px)">
-                    <button>이미지 업로드</button>
+	
+	<div class="container">
+    <!-- 사이드바 Include -->
+    
+    <%@ include file="/views/common/AdminSidebar.jsp" %>
+    <!-- 메인 콘텐츠 -->
+   
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <h1>관리자 페이지</h1>
 
-                    <label for="banner">이벤트 배너</label>
-                    <input type="file" id="banner">
-                    <button>이미지 업로드</button>
-                </form>
+            <!-- 스킨편집 섹션 -->
+            <div class="section">
+                <h3>스킨편집</h3>
+                <div>
+                    <h4>타이틀 헤더</h4>
+                    <label for="logo-upload">로고(넓이 180px)</label>
+                    <input type="file" id="logo-upload" name="logo-upload">
+                </div>
+                <div>
+                    <h4>이벤트 배너 섹션</h4>
+                    <label for="banner-upload">메인 이벤트 배너 이미지</label>
+                    <input type="file" id="banner-upload" name="banner-upload">
+                </div>
+                <div>
+                    <h4>메인 - SNS</h4>
+                    <label for="youtube-link">유튜브 링크</label>
+                    <input type="text" id="youtube-link" name="youtube-link" placeholder="예) https://www.youtube.com/embed/...">
+                </div>
             </div>
 
-            <!-- 2번 섹션 -->
+            <!-- 추가된 COMMUNITY 섹션 -->
             <div class="section">
-                <h2>2) COMMUNITY 섹션</h2>
-                <form>
-                    <label for="banner1">배너 1 배경 이미지</label>
-                    <input type="file" id="banner1">
-                    <button>이미지 업로드</button>
-
-                    <label for="bannerUrl">배너 1 바로가기 URL</label>
-                    <input type="url" id="bannerUrl" placeholder="URL 입력">
-
-                    <label for="bannerText">배너 1 문구</label>
-                    <input type="text" id="bannerText" placeholder="문구 입력">
-
-                    <label for="bannerColor">배너 1 문구 색상</label>
-                    <input type="color" id="bannerColor">
-                </form>
+                <h3>COMMUNITY 섹션</h3>
+                <div>
+                    <h4>배너 1 배경 이미지</h4>
+                    <input type="file" id="banner-bg" name="banner-bg">
+                </div>
+                <div>
+                    <h4>배너 1 버튼가기 URL</h4>
+                    <input type="text" id="banner-url" name="banner-url" placeholder="링크를 입력하세요.">
+                </div>
+                <div>
+                    <h4>배너 1 문구</h4>
+                    <input type="text" id="banner-text" name="banner-text" placeholder="문구를 입력하세요.">
+                </div>
+                <div>
+                    <h4>배너 1 문구 색상</h4>
+                    <input type="color" id="banner-color" name="banner-color">
+                </div>
             </div>
-        </main>
+        </div>
     </div>
 </body>
 </html>

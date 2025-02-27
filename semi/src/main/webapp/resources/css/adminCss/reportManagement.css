@@ -8,7 +8,14 @@
     padding: 0;
     background-color: #f9f9f9;
 }
-
+.header-container {
+    display: flex; /* 자식 요소를 가로 배치 */
+    justify-content: space-between; /* 양쪽 끝으로 배치 */
+    align-items: center; /* 세로 중앙 정렬 */
+    width: 100%; /* 전체 너비 사용 */
+    padding: 10px 20px; /* 여백 추가 */
+    box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
 /* 메인 콘텐츠 */
 .main-content {
     flex-grow: 1; /* 남은 공간을 차지 */
@@ -135,3 +142,5 @@ table th {
         font-size: 0.8rem;
     }
 }
+
+

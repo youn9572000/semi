@@ -3,30 +3,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>관리자 메인 페이지</title>
-<link rel="stylesheet" type="text/css" href="resources/css/common.css">
-</head>
-<body>
-        
+    <title>관리자 메인 페이지</title>
+  
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+    $.ajax({
+        url: '<%= request.getContextPath() %>/visitor?action=display',
+        method: 'GET',
+        success: function (response) {
+            console.log("응답 데이터: ", response);
 
- <div class="container">
-	<%@ include file="/views/common/AdminSidebar.jsp" %>
+            // response를 직접 사용
+            $('#totalVisitors').text(response.totalVisitors || 0);
+            $('#todayVisitors').text(response.todayVisitors || 0);
+            $('#yesterdayVisitors').text(response.yesterdayVisitors || 0);
+        },
+        error: function (xhr, status, error) {
+            console.error("데이터 로드 실패:", error);
+        }
+    });
+});
+</script>
+</head>
+
+<body>
+    <div class="container">
+        <%@ include file="/views/common/AdminSidebar.jsp"%>
         <!-- 메인 컨텐츠 -->
         <main class="main-content">
             <header>
                 <h1>방문자수 통계</h1>
                 <div class="stats">
                     <div>
-                        <span>전체 방문자</span>
-                        <strong>2,504,002</strong>
+                        <span>전체 방문자</span>  
+                       <strong id="totalVisitors">0</strong>
                     </div>
                     <div>
-                        <span>Today</span>
-                        <strong>379</strong>
+                        <span>Today</span>  
+                      <strong id="todayVisitors">0</strong>
                     </div>
                     <div>
-                        <span>Yesterday</span>
-                        <strong>1,578</strong>
+                        <span>Yesterday</span> 
+                         <strong id="yesterdayVisitors">0</strong>
                     </div>
                 </div>
             </header>
@@ -55,7 +74,5 @@
             </section>
         </main>
     </div>
-
-
 </body>
 </html>
